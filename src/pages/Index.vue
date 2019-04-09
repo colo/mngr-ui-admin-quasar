@@ -8,7 +8,23 @@
 </style>
 
 <script>
+import { Loading } from 'quasar';
+
 export default {
   name: 'PageIndex',
+
+  preFetch({
+    store, currentRoute, previousRoute, redirect, ssrContext,
+  }) {
+    Loading.show();
+
+    return new Promise((resolve) => {
+      // do something async here
+      // then call "resolve()"
+      setTimeout(resolve, 1000);
+    }).then(() => {
+      Loading.hide();
+    });
+  },
 };
 </script>

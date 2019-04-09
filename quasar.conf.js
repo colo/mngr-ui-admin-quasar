@@ -2,6 +2,7 @@
 
 module.exports = function (ctx) {
   return {
+    preFetch: true,
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
@@ -15,11 +16,12 @@ module.exports = function (ctx) {
 
     extras: [
       'roboto-font',
-      'material-icons' // optional, you are not bound to it
+      'material-icons', // optional, you are not bound to it
       // 'ionicons-v4',
       // 'mdi-v3',
-      // 'fontawesome-v5',
-      // 'eva-icons'
+      'fontawesome-v5',
+      // 'eva-icons',
+      // 'themify'
     ],
 
     framework: {
@@ -38,7 +40,8 @@ module.exports = function (ctx) {
         'QList',
         'QItem',
         'QItemSection',
-        'QItemLabel'
+        'QItemLabel',
+        'QSelect'
       ],
 
       directives: [
@@ -48,8 +51,9 @@ module.exports = function (ctx) {
       // Quasar plugins
       plugins: [
         'Notify'
-      ]
+      ],
 
+      iconSet: 'fontawesome-v5',
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language
     },
@@ -72,6 +76,14 @@ module.exports = function (ctx) {
           options: {
             fix: true
           }
+        })
+
+        cfg.module.rules.push({
+          resourceQuery: /blockType=i18n/,
+          use: [
+            {loader: '@kazupon/vue-i18n-loader'},
+            // {loader: 'yaml-loader'}
+          ]
         })
       }
     },
