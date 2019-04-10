@@ -7,7 +7,8 @@ module.exports = function (ctx) {
     // --> boot files are part of "main.js"
     boot: [
       'i18n',
-      'axios'
+      'axios',
+      'addressbar-color'
     ],
 
     css: [
@@ -29,6 +30,7 @@ module.exports = function (ctx) {
       // all: true, // --- includes everything; for dev only!
 
       components: [
+        'QSpace',
         'QLayout',
         'QHeader',
         'QDrawer',
@@ -42,7 +44,20 @@ module.exports = function (ctx) {
         'QItem',
         'QItemSection',
         'QItemLabel',
-        'QSelect'
+        'QSelect',
+        'QBreadcrumbs',
+        'QBreadcrumbsEl',
+        'QSeparator',
+        'QCard',
+        'QTab',
+        'QTabs',
+        'QTabPanels',
+        'QTabPanel',
+        'QSlider',
+        'QCheckbox',
+        'QToggle',
+        'QCardSection',
+        'QExpansionItem'
       ],
 
       directives: [
@@ -51,7 +66,8 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-        'Notify'
+        'Notify',
+        'AddressbarColor'
       ],
 
       iconSet: 'fontawesome-v5',
