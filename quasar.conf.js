@@ -11,7 +11,8 @@ module.exports = function (ctx) {
     ],
 
     css: [
-      'app.styl'
+      'app.styl',
+      'quasar.variables.styl',
     ],
 
     extras: [
@@ -62,8 +63,8 @@ module.exports = function (ctx) {
 
     build: {
       scopeHoisting: true,
-      // vueRouterMode: 'history',
-      // vueCompiler: true,
+      vueRouterMode: 'history',
+      vueCompiler: true,
       // gzip: true,
       // analyze: true,
       // extractCSS: false,

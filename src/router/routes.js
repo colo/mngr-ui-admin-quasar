@@ -2,9 +2,33 @@
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MyLayout.vue'),
+    component: () => import('layouts/App'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') },
+      { path: '', component: () => import('pages/Index') },
+
+      {
+        path: 'dashboard',
+
+        // We point it to our component
+        // where we defined our QLayout
+        component: () => import('layouts/Dashboard'),
+
+        // Now we define the sub-routes.
+        // These are getting injected into
+        // layout (from above) automatically
+        // by using <router-view> placeholder
+        // (need to specify it in layout)
+        children: [
+          {
+            path: '',
+            component: () => import('pages/dashboard/default'),
+          },
+          // {
+          //   path: 'profile',
+          //   component: () => import('pages/user-profile')
+          // }
+        ],
+      },
     ],
   },
 ];
