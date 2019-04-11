@@ -5,9 +5,11 @@
 </template>
 
 <script>
+// import mootools from 'mootools'
+
 export default {
-  name: 'App',
-};
+  name: 'App'
+}
 </script>
 
 <style>

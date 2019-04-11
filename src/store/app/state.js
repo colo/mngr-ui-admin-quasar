@@ -10,7 +10,7 @@ export default function () {
         positive: '#66aa00',
         negative: '#dc3912',
         info: '#3366cc',
-        warning: '#ffad33',
+        warning: '#ffad33'
       },
       slate: {// slate
         primary: '#3a3f44',
@@ -19,8 +19,8 @@ export default function () {
         positive: '#6ec86e',
         negative: '#ee605c',
         info: '#4bb9db',
-        warning: '#f9a022',
-      },
+        warning: '#f9a022'
+      }
     },
     // docs: {
     //   count: null,
@@ -36,7 +36,7 @@ export default function () {
     reset: false,
     suspend: false,
     pause: false,
-    freeze: false,
+    freeze: false
     /**
     *
     * */
@@ -52,5 +52,5 @@ export default function () {
     //   'mdi-network': /networkInterfaces.*/
     //   // 'mdi-pulse': /.*/
     // },
-  };
+  }
 }

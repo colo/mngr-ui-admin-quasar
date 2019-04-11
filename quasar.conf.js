@@ -1,5 +1,7 @@
 // Configuration for your app
 
+const path = require('path')
+
 module.exports = function (ctx) {
   return {
     preFetch: true,
@@ -8,6 +10,7 @@ module.exports = function (ctx) {
     boot: [
       'i18n',
       'axios',
+      'mootools'
       // 'addressbar-color'
     ],
 
@@ -102,6 +105,17 @@ module.exports = function (ctx) {
             // {loader: 'yaml-loader'}
           ]
         })
+
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias, // This adds the existing alias
+
+
+          // Add your own alias like this
+          '@libs': path.resolve(__dirname, './src/libs'),
+          '@etc': path.resolve(__dirname, './src/etc'),
+          '@components': path.resolve(__dirname, './src/components'),
+          '@mixins': path.resolve(__dirname, './src/components/mixins')
+        }
       }
     },
 

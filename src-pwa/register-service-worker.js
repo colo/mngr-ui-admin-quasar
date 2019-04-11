@@ -3,30 +3,30 @@
  * when building for PRODUCTION
  */
 
-import { register } from 'register-service-worker';
+import { register } from 'register-service-worker'
 
 register(process.env.SERVICE_WORKER_FILE, {
-  ready() {
-    console.log('App is being served from cache by a service worker.');
+  ready () {
+    console.log('App is being served from cache by a service worker.')
   },
-  registered(registration) { // registration -> a ServiceWorkerRegistration instance
-    console.log('Service worker has been registered.', registration);
+  registered (registration) { // registration -> a ServiceWorkerRegistration instance
+    console.log('Service worker has been registered.', registration)
   },
-  cached(registration) { // registration -> a ServiceWorkerRegistration instance
-    console.log('Content has been cached for offline use.', registration);
+  cached (registration) { // registration -> a ServiceWorkerRegistration instance
+    console.log('Content has been cached for offline use.', registration)
   },
-  updatefound(registration) { // registration -> a ServiceWorkerRegistration instance
-    console.log('New content is downloading.', registration);
+  updatefound (registration) { // registration -> a ServiceWorkerRegistration instance
+    console.log('New content is downloading.', registration)
   },
-  updated(registration) { // registration -> a ServiceWorkerRegistration instance
-    console.log('New content is available; please refresh.', registration);
+  updated (registration) { // registration -> a ServiceWorkerRegistration instance
+    console.log('New content is available; please refresh.', registration)
   },
-  offline() {
-    console.log('No internet connection found. App is running in offline mode.');
+  offline () {
+    console.log('No internet connection found. App is running in offline mode.')
   },
-  error(err) {
-    console.error('Error during service worker registration:', err);
-  },
-});
+  error (err) {
+    console.error('Error during service worker registration:', err)
+  }
+})
 
 // ServiceWorkerRegistration: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration

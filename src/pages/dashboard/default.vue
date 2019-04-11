@@ -121,7 +121,6 @@
                 </q-card-section>
               </q-card>
 
-
             </q-expansion-item>
 
           </q-list>
@@ -283,7 +282,6 @@
           </q-list>
         </q-tab-panel>
 
-
       </q-tab-panels>
     </q-card>
 
@@ -298,7 +296,6 @@
         .col-12 .col-md-auto (Variable width content)
       </div>
 
-
        <div class="col-auto gt-sm">
 
         ads
@@ -310,11 +307,27 @@
   </q-page>
 </template>
 
-
 <script>
+
+import * as Debug from 'debug'
+
+const debug = Debug('mngr-ui:pages:dashboard:default')
+// const debug_internals = Debug('mngr-ui:pages:dashboard:default:Internals')
+// const debug_events = Debug('mngr-ui:pages:dashboard:default:Events')
+
+// import dashboard from '@components/dashboard'
+import dashboardMixin from '@mixins/dashboard'
+
 export default {
-  data() {
+  // components: {
+  //   dashboard
+  // },
+  mixins: [dashboardMixin],
+
+  data () {
     return {
+      id: 'default',
+
       drawer: true,
       tab: 'mails',
 
@@ -328,8 +341,23 @@ export default {
 
       volume: 6,
       brightness: 3,
-      mic: 8,
-    };
+      mic: 8
+    }
   },
-};
+  created: function () {
+    this.id = this.id
+  },
+  preFetch ({ store, currentRoute, previousRoute, redirect, ssrContext }) {
+    if (process.env.DEV) { debug('preFetch %o', currentRoute) }
+
+    debug('preFetch %o', currentRoute)
+    // store.registerModule('foo', fooStoreModule)
+    // return store.dispatch('foo/inc')
+    // if (currentRoute.params.id) { this.id = currentRoute.params.id }
+  }
+
+  // mounted () {
+  //   debug(process.env.DEV, process.env.NODE_ENV)
+  // }
+}
 </script>

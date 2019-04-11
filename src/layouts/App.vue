@@ -78,10 +78,7 @@
           :key="index"
           v-bind="breadcrumb"
           />
-          <!-- {{ index }} -->
-          <!-- :class="{'linked': !!breadcrumb.link}" -->
         </q-breadcrumbs>
-
       </q-toolbar>
     </q-header>
 
@@ -103,13 +100,13 @@
     <!-- overlay -->
       <q-list :dark="$store.state.app.theme.current === 'slate'">
         <!-- <q-item-label header>Essential Links</q-item-label> -->
-        <q-item clickable tag="a" to="/dashboard">
+        <q-item clickable to="/dashboard">
           <q-item-section avatar>
-            <q-icon name="fas fa-graduation-cap" class="text-grey"/>
+            <q-icon name="fas fa-tachometer-alt" class="text-grey"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>v1.quasar-framework.org</q-item-label>
+            <q-item-label class="text-grey">Dashboard</q-item-label>
+            <!-- <q-item-label caption>v1.quasar-framework.org</q-item-label> -->
           </q-item-section>
         </q-item>
 
@@ -143,7 +140,7 @@
 
 <script>
 // import { openURL, colors } from 'quasar';
-import { openURL } from 'quasar';
+// import { openURL } from 'quasar'
 
 // import languages from 'quasar/lang/index.json';
 
@@ -151,40 +148,55 @@ import { openURL } from 'quasar';
 
 // const { lighten, setBrand } = colors;
 
+import * as Debug from 'debug'
+const debug = Debug('mngr-ui:layout:App')
+// const debug_internals = Debug('mngr-ui:layout:App:Internals')
+// const debug_events = Debug('mngr-ui:layout:App:Events')
+
 export default {
   name: 'MyLayout',
-  data() {
+  data () {
     return {
       // leftDrawerOpen: this.$q.platform.is.desktop,
       tab: '',
       drawer: true,
       miniState: true,
       // right: true,
-      lang: this.$q.lang.isoName,
+      lang: this.$q.lang.isoName
       // dark: true,
-    };
+    }
   },
-  mounted() {
-    this.$store.commit('app/setTheme', this.$store.state.app.theme.current);
+  mounted () {
+    this.$store.commit('app/setTheme', this.$store.state.app.theme.current)
   },
   computed: {
-    breadcrumbs() {
-      const pathArray = this.$route.path.split('/');
+    breadcrumbs () {
+      const pathArray = this.$route.path.split('/')
       // console.log('breadcrumbs', this.$route.path, this.$route.matched);
       // pathArray.shift();
-      const breadcrumbs = pathArray.reduce((breadcrumbArray, path, idx) => {
-        breadcrumbArray.push({
+      // const breadcrumbs = pathArray.reduce((breadcrumbArray, path, idx) => {
+      //   breadcrumbArray.push({
+      //     path,
+      //     to: breadcrumbArray[idx - 1]
+      //       ? `${breadcrumbArray[idx - 1].path}/${path}`
+      //       : `/${path}`,
+      //     ...this.$route.matched[idx].meta.breadcrumb
+      //   })
+      //   return breadcrumbArray
+      // }, [])
+      const breadcrumbs = []
+      Array.each(pathArray, function (path, index) {
+        breadcrumbs.push({
           path,
-          to: breadcrumbArray[idx - 1]
-            ? `${breadcrumbArray[idx - 1].path}/${path}`
+          to: pathArray[index - 1]
+            ? `${pathArray[index - 1].path}/${path}`
             : `/${path}`,
-          ...this.$route.matched[idx].meta.breadcrumb,
-        });
-        return breadcrumbArray;
-      }, []);
-      // console.log('breadcrumbs', breadcrumbs);
-      return breadcrumbs;
-    },
+          ...this.$route.matched[index].meta.breadcrumb
+        })
+      }.bind(this))
+      console.log('breadcrumbs', breadcrumbs)
+      return breadcrumbs
+    }
   },
 
   // watch: {
@@ -203,7 +215,7 @@ export default {
   //   }));
   // },
   methods: {
-    openURL,
+    // openURL
     // swap_theme() {
     //   this.$store.commit('app/swapTheme');
     //   // let palette = {};
@@ -246,8 +258,8 @@ export default {
     //   // //
     //   // // });
     // },
-  },
-};
+  }
+}
 </script>
 
 <style>
