@@ -15,8 +15,12 @@
 
     <!-- <q-header elevated class="shadow-1"> -->
      <!-- class="bg-primary text-white shadow-1" -->
-      <q-header elevated>
-      <q-toolbar>
+      <q-header
+        elevated
+        content-class="bg-primary"
+        :dark="$store.state.app.theme.current === 'slate'"
+      >
+      <q-toolbar content-class="bg-primary" :dark="$store.state.app.theme.current === 'slate'">
         <q-btn
           flat
           dense
@@ -24,10 +28,14 @@
           @click="drawer = !drawer"
           aria-label="Menu"
           icon="menu"
+          class="text-grey"
         >
         </q-btn>
 
-        <q-toolbar-title>
+        <q-toolbar-title
+          :dark="$store.state.app.theme.current === 'slate'"
+          class="text-grey"
+        >
           Quasar App
         </q-toolbar-title>
         <q-space />
@@ -36,8 +44,16 @@
           notice shrink property since we are placing it
           as child of QToolbar
         -->
-        <q-tabs v-model="tab" shrink>
-          <q-tab name="theme" icon="home" @click="change_theme"/>
+        <q-tabs
+          v-model="tab"
+          shrink
+        >
+          <q-tab
+            class="text-grey"
+            name="theme"
+            icon="fas fa-palette"
+            @click="$store.commit('app/swapTheme')"
+          />
         </q-tabs>
         <!-- <q-select
           v-model="lang"
@@ -56,7 +72,7 @@
         <!-- <q-btn dense flat round icon="menu"  @click="right = !right" /> -->
       </q-toolbar>
       <q-toolbar inset>
-        <q-breadcrumbs active-color="white">
+        <q-breadcrumbs active-color="info" class="text-grey">
           <q-breadcrumbs-el
           v-for="(breadcrumb, index) in breadcrumbs"
           :key="index"
@@ -81,16 +97,15 @@
       :mini="miniState"
       @mouseover="miniState = false"
       @mouseout="miniState = true"
-
       show-if-above
-      content-class="bg-secondary text-grey-4"
+      content-class="bg-secondary"
     >
     <!-- overlay -->
-      <q-list :dark="dark">
+      <q-list :dark="$store.state.app.theme.current === 'slate'">
         <!-- <q-item-label header>Essential Links</q-item-label> -->
         <q-item clickable tag="a" to="/dashboard">
           <q-item-section avatar>
-            <q-icon name="fas fa-graduation-cap" />
+            <q-icon name="fas fa-graduation-cap" class="text-grey"/>
           </q-item-section>
           <q-item-section>
             <q-item-label>Docs</q-item-label>
@@ -127,13 +142,14 @@
 </template>
 
 <script>
-import { openURL, colors } from 'quasar';
+// import { openURL, colors } from 'quasar';
+import { openURL } from 'quasar';
 
 // import languages from 'quasar/lang/index.json';
 
 // import { colors } from 'quasar';
 
-const { lighten, setBrand } = colors;
+// const { lighten, setBrand } = colors;
 
 export default {
   name: 'MyLayout',
@@ -145,8 +161,11 @@ export default {
       miniState: true,
       // right: true,
       lang: this.$q.lang.isoName,
-      dark: true,
+      // dark: true,
     };
+  },
+  mounted() {
+    this.$store.commit('app/setTheme', this.$store.state.app.theme.current);
   },
   computed: {
     breadcrumbs() {
@@ -185,33 +204,48 @@ export default {
   // },
   methods: {
     openURL,
-    change_theme() {
-      const white = {
-        primary: '#f8f8f8',
-        secondary: '#cdcdcd',
-        accent: '#567a9a',
-        positive: '#66aa00',
-        negative: '#dc3912',
-        info: '#3366cc',
-        warning: '#ffad33',
-      };
-
-      this.dark = false;
-      this.$q.addressbarColor.set(white.primary);
-
-      Object.keys(white).map((name, index) => {
-        const color = white[name];
-        // console.log(value);
-        setBrand(name, color);
-        setBrand(`${name}-darkened`, lighten(color, -50));
-        return true;
-      });
-
-
-      // Object.each(white, (color, name) => {
-      //
-      // });
-    },
+    // swap_theme() {
+    //   this.$store.commit('app/swapTheme');
+    //   // let palette = {};
+    //   // if (this.dark) {
+    //   //   palette = {// white
+    //   //     primary: '#f8f8f8',
+    //   //     secondary: '#ffffff', // '#cdcdcd',
+    //   //     accent: '#567a9a',
+    //   //     positive: '#66aa00',
+    //   //     negative: '#dc3912',
+    //   //     info: '#3366cc',
+    //   //     warning: '#ffad33',
+    //   //   };
+    //   // } else {
+    //   //   palette = {// slate
+    //   //     primary: '#3a3f44',
+    //   //     secondary: '#272B30',
+    //   //     accent: '#17191b',
+    //   //     positive: '#6ec86e',
+    //   //     negative: '#ee605c',
+    //   //     info: '#4bb9db',
+    //   //     warning: '#f9a022',
+    //   //   };
+    //   // }
+    //   //
+    //   // this.dark = !this.dark;
+    //   //
+    //   // this.$q.addressbarColor.set(palette.primary);
+    //   //
+    //   // Object.keys(palette).map((name, index) => {
+    //   //   const color = palette[name];
+    //   //   // console.log(value);
+    //   //   setBrand(name, color);
+    //   //   setBrand(`${name}-darkened`, lighten(color, -50));
+    //   //   return true;
+    //   // });
+    //   //
+    //   //
+    //   // // Object.each(white, (color, name) => {
+    //   // //
+    //   // // });
+    // },
   },
 };
 </script>

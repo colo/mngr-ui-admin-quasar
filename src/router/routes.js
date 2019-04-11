@@ -27,16 +27,19 @@ const routes = [
         // layout (from above) automatically
         // by using <router-view> placeholder
         // (need to specify it in layout)
-        // children: [
-        //   {
-        //     path: '',
-        //     component: () => import('pages/dashboard/default'),
-        //   },
-        //   // {
-        //   //   path: 'profile',
-        //   //   component: () => import('pages/user-profile')
-        //   // }
-        // ],
+        children: [
+          {
+            path: ':name',
+            component: () => import('pages/dashboard/default'),
+            meta: {
+              breadcrumb: { label: 'child Dashboard', icon: 'widgets' },
+            },
+          },
+          // {
+          //   path: 'profile',
+          //   component: () => import('pages/user-profile')
+          // }
+        ],
       },
     ],
   },

@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-// import example from './module-example'
+import VuexPersistence from 'vuex-persist';
+
+import app from './app';
 
 Vue.use(Vuex);
 
@@ -10,10 +12,21 @@ Vue.use(Vuex);
  * directly export the Store instantiation
  */
 
+
+const vuexLocal = new VuexPersistence({
+  storage: window.localStorage,
+  // reducer: state => ({
+  //   app: state.app, hosts : state.hosts, stats: state.stats
+  // }), //only save app module
+  modules: ['app'],
+});
+
+
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
+    plugins: [vuexLocal.plugin],
     modules: {
-      // example
+      app,
     },
 
     // enable strict mode (adds overhead!)
