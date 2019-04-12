@@ -10,7 +10,8 @@ module.exports = function (ctx) {
     boot: [
       'i18n',
       'axios',
-      'mootools'
+      'eventbus',
+      // 'mootools'
       // 'addressbar-color'
     ],
 

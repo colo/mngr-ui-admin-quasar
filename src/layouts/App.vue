@@ -194,7 +194,7 @@ export default {
           ...this.$route.matched[index].meta.breadcrumb
         })
       }.bind(this))
-      console.log('breadcrumbs', breadcrumbs)
+      // console.log('breadcrumbs', breadcrumbs)
       return breadcrumbs
     }
   },

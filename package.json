@@ -13,8 +13,13 @@
   "dependencies": {
     "@quasar/extras": "^1.1.1",
     "axios": "^0.18.0",
+    "dygraphs": "^2.1.0",
+    "js-pipeline": "git+https://github.com/colo/js-pipeline.git",
+    "mngr-ui-admin-charts": "git+https://github.com/colo/mngr-ui-admin-charts.git",
+    "moment": "^2.24.0",
     "mootools": "^1.5.2",
     "mootools-core-dist": "^1.5.1-dist",
+    "node-app-socket.io-client": "git+https://github.com/colo/node-app-socket.io-client.git",
     "quasar": "^1.0.0-beta.0",
     "vue-i18n": "^7.3.3",
     "vuex-persist": "^2.0.0"

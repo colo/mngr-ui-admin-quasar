@@ -29,10 +29,10 @@ const routes = [
         // (need to specify it in layout)
         children: [
           {
-            path: ':id',
-            component: () => import('pages/dashboard/default'),
+            path: 'host/:id',
+            component: () => import('pages/dashboard/host'),
             meta: {
-              breadcrumb: { label: 'child Dashboard', icon: 'widgets' }
+              breadcrumb: { label: 'Host', icon: 'widgets' }
             }
           }
           // {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-// import mootools from 'mootools'
+import mootools from 'mootools'
 
 export default {
   name: 'App'
