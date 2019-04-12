@@ -29,7 +29,7 @@ const routes = [
         // (need to specify it in layout)
         children: [
           {
-            path: 'host/:id',
+            path: 'host/:host',
             component: () => import('pages/dashboard/host'),
             meta: {
               breadcrumb: { label: 'Host', icon: 'widgets' }

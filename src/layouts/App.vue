@@ -72,13 +72,13 @@
         <!-- <q-btn dense flat round icon="menu"  @click="right = !right" /> -->
       </q-toolbar>
       <q-toolbar inset>
-        <q-breadcrumbs active-color="info" class="text-grey">
+        <!-- <q-breadcrumbs active-color="info" class="text-grey">
           <q-breadcrumbs-el
           v-for="(breadcrumb, index) in breadcrumbs"
           :key="index"
           v-bind="breadcrumb"
           />
-        </q-breadcrumbs>
+        </q-breadcrumbs> -->
       </q-toolbar>
     </q-header>
 

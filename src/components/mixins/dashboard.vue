@@ -1,5 +1,25 @@
 <template>
-  <div></div>
+  <q-page class="bg-secondary">
+
+    <dashboard-menu />
+
+    <div class="q-pa-md row">
+      <!-- <div class="column items-end"> -->
+        <!-- <div class="col">
+         .col
+       </div> -->
+       <div class="col-8">
+
+      </div>
+
+       <div class="col-auto gt-sm">
+
+      </div>
+      <!-- </div> -->
+    </div>
+    <!-- <div class="text-white">hello</div> -->
+    <!-- <img alt="Quasar logo" src="~assets/quasar-logo-full.svg"> -->
+  </q-page>
 </template>
 
 <script>
@@ -26,7 +46,12 @@ const MINUTE = SECOND * 60
 const HOUR = MINUTE * 60
 const DAY = HOUR * 24
 
+import dashboardMenu from '@components/dashboard/menu.vue'
+
 export default {
+  components: {
+    dashboardMenu
+  },
 
   __events_watcher: undefined,
   __pipelines_events: {},
@@ -206,7 +231,8 @@ export default {
       if (id && !this.$store.state['dashboard_' + id]) { this.$store.registerModule('dashboard_' + id, Object.clone(dashboardStoreModule)) }
     },
 
-    create_pipelines: function (host, next) {},
+    create_pipelines: function (next) {},
+    destroy_pipelines: function () {},
     /**
     * @start - events
     **/
@@ -663,7 +689,8 @@ export default {
     __clean_destroy: function (next) {
       this.$store.commit('dashboard_' + this.id + '/events/clean')
 
-      this.$store.unregisterModule('dashboard_' + this.id)
+      // this.$store.unregisterModule('dashboard_' + this.id)
+      this.__register_module(undefined, this.id)
 
       if (!this.$options.__events_watcher) { this.$options.__events_watcher() }
 
@@ -696,10 +723,11 @@ export default {
       this.$set(this, 'reactive_data', {})
       this.$set(this, 'available_charts', {})
 
-      this.$store.commit('tabular_sources/clear')
-      this.$store.commit('stat_sources/clear')
+      if (this.$store.state.tabular_sources) this.$store.commit('tabular_sources/clear')
+      if (this.$store.state.stat_sources) this.$store.commit('stat_sources/clear')
 
-      this.id = undefined
+      // this.id = undefined
+
       // this.$store.dispatch('stats/flush_all', {host: this.host})
       // this.$store.dispatch('stats_tabular/flush_all', {host: this.host})
 
@@ -819,27 +847,28 @@ export default {
   /**
   * @start - lifecycle
   **/
-  beforeRouteUpdate: function (to, from, next) {
-    if (process.env.DEV) debug('life cycle beforeRouteUpdate', to.params.host, from)
-    // console.log('life cycle beforeRouteUpdate')
-
-    // react to route changes...
-    // don't forget to call next()
-    this.__clean_destroy(
-      this.__clean_create.pass(
-        this.__create.pass([
-          // this.$route.params.host || this.$store.state.hosts.current,
-          to.params.host,
-          this.__mount.pass(next, this)
-        ], this),
-        this
-      )
-    )
-
-    // next()
-  },
+  // beforeRouteUpdate: function (to, from, next) {
+  //   if (process.env.DEV) debug('life cycle beforeRouteUpdate', to.params.host, from)
+  //   // console.log('life cycle beforeRouteUpdate')
+  //
+  //   // react to route changes...
+  //   // don't forget to call next()
+  //   this.__clean_destroy(
+  //     this.__clean_create.pass(
+  //       this.__create.pass([
+  //         // this.$route.params.host || this.$store.state.hosts.current,
+  //         to.params.host,
+  //         this.__mount.pass(next, this)
+  //       ], this),
+  //       this
+  //     )
+  //   )
+  //
+  //   // next()
+  // },
   created: function () {
-    // console.log('life cycle created')
+    debug('life cycle created')
+
     this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
       if (process.env.DEV) debug('events', newVal)
       // this.$options.__events_watcher = this.$watch('events', function(newVal, old){

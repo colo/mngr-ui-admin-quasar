@@ -1,20 +1,29 @@
 <template>
   <q-page class="bg-secondary">
 
-    <dashboard-menu />
+    <!-- <dashboard-menu /> -->
 
     <div class="q-pa-md row justify-end">
+      <router-view />
       <!-- <div class="column items-end"> -->
         <!-- <div class="col">
          .col
        </div> -->
        <div class="col-8">
-        .col-12 .col-md-auto (Variable width content)
+
       </div>
 
        <div class="col-auto gt-sm">
-
-        ads
+         <q-btn
+           flat
+           dense
+           round
+           to="/dashboard/host/colo"
+           aria-label="Colo"
+           icon="menu"
+           class="text-grey"
+         >
+         </q-btn>
       </div>
       <!-- </div> -->
     </div>
@@ -31,14 +40,11 @@ const debug = Debug('mngr-ui:pages:dashboard:default')
 // const debug_internals = Debug('mngr-ui:pages:dashboard:default:Internals')
 // const debug_events = Debug('mngr-ui:pages:dashboard:default:Events')
 
-import dashboardMenu from '@components/dashboard/menu.vue'
-import dashboardMixinDygraph from '@mixins/dashboard.dygraph'
+// import dashboardMixinDygraph from '@mixins/dashboard.dygraph'
 
 export default {
-  components: {
-    dashboardMenu
-  },
-  mixins: [dashboardMixinDygraph],
+
+  // mixins: [dashboardMixinDygraph],
 
   data () {
     return {

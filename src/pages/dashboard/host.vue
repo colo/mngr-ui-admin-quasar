@@ -1,6 +1,8 @@
 
 <script>
 
+import dashboardMenu from '@components/dashboard/menu.vue'
+
 import { EventBus } from 'boot/eventbus'
 
 import * as Debug from 'debug'
@@ -32,9 +34,9 @@ import HostPipeline from '@libs/pipelines/host'
 // import HostHistoricalTemplatePipeline from '@libs/pipelines/host.historical.template'
 // import HostMuninTemplatePipeline from '@libs/pipelines/host.munin.template'
 
-let host_pipelines_templates = [
-  HostPipeline
-]
+// let host_pipelines_templates = [
+//   HostPipeline
+// ]
 
 // import AdminLteBoxSolid from 'components/admin-lte/boxSolid'
 // import AdminLteDashboardHostSummary from 'components/admin-lte/dashboard/host/summary'
@@ -60,7 +62,7 @@ import dygraph_line_chart from 'mngr-ui-admin-charts/defaults/dygraph.line'
 // import charts_payloads from '@etc/charts.payloads'
 import host_charts_payloads from '@etc/host.charts.payloads'
 
-import dashboard from 'components/mixins/dashboard'
+import dashboard from 'components/mixins/dashboard.dygraph'
 
 const SECOND = 1000
 const MINUTE = SECOND * 60
@@ -106,19 +108,23 @@ export default {
   //   }
   // },
 
-  breadcrumb () {
-    return {
-      label: this.host,
-      parent: 'Dashboard'
-    }
-  },
+  // breadcrumb () {
+  //   return {
+  //     label: this.host,
+  //     parent: 'Dashboard'
+  //   }
+  // },
 
   tabular_sources: undefined,
   stat_sources: undefined,
   MAX_DATA_POINTS: 300,
 
+  __pipelines_events: {},
+  pipelines: {},
+
   data () {
     return {
+      id: 'host',
 
       daterangepicker: {
         opens: 'right',
@@ -200,6 +206,9 @@ export default {
     })
 
   ),
+  created: function () {
+    this.id = this.id
+  },
 
   // updated: function(){
   //   debug('updated', this.$route.params.host)
@@ -1019,27 +1028,6 @@ export default {
         }.bind(this))
       }.bind(this)
 
-      // debug('$store.state.tabular_sources', this.$store.state.tabular_sources.length)
-      // debug('$options.tabular_sources', this.$options.tabular_sources.length)
-      // debug('$options.stat_sources', this.$options.stat_sources.length)
-
-      // let __unwatch_tabular_sources = this.$watch('$store.state.tabular_sources', function(tabular_sources){
-      //   //   __unwatch_tabular_sources()
-      //   debug('$store.state.tabular_sources', tabular_sources, this.id)
-      //
-      //   if(tabular_sources
-      //     && this.available_charts
-      //     && this.dashboard_instances
-      //     && this.$store.state['dashboard_'+this.host].paths.length > 0
-      //   ){
-      //     __create_from_tabular_sources(tabular_sources)
-      //     __create_os_procs_percentage_cpu(tabular_sources)
-      //     __create_os_networkInterfaces_stats_packets_drop_err(tabular_sources)
-      //     __create_os_mounts(tabular_sources)
-      //   }
-      //
-      //
-      // }.bind(this), {deep: true})
       let __tabular_sources_event = function () {
         //   __unwatch_tabular_sources()
         if (
@@ -1060,20 +1048,6 @@ export default {
 
       this.$on('tabular_sources', __tabular_sources_event)
 
-      // }.bind(this), {deep: true})
-
-      // let __unwatch_stat_sources = this.$watch('$store.state.stat_sources', function(stat_sources){
-      //   //   __unwatch_tabular_sources()
-      //   if(stat_sources
-      //     && this.available_charts
-      //     && this.dashboard_instances
-      //     && this.$store.state['dashboard_'+this.host].paths.length > 0
-      //   ){
-      //     __create_from_stat_sources(stat_sources)
-      //     __create_freemem(stat_sources)
-      //   }
-      //   // }
-      // }.bind(this), {deep: true})
       let __stat_sources_event = function () {
         //   __unwatch_tabular_sources()
 
@@ -1092,299 +1066,6 @@ export default {
       }.bind(this)
 
       this.$on('stat_sources', __stat_sources_event)
-      // }.bind(this), {deep: true})
-
-      //
-      // /**
-      // * remove for testing
-      // **/
-      //
-      // /**
-      // * pie
-      // **/
-      // // this.available_charts[this.host+'_os_cpus_percentage_pie'] = {
-      // //   name: this.host+'_os_cpus_percentage_pie',
-      // //   chart: Object.merge(Object.clone(pie_chart), {
-      // //     options:{
-      // //       // 'track-color': false,
-      // //       size: 120,
-      // //       // animated: false,
-      // //       'font-size': '24px',
-      // //       "bar-color": function(percentage){
-      // //         if(percentage > 0 && percentage < 33){
-      // //           return '#86b300'
-      // //         }
-      // //         else if(percentage > 33 && percentage < 66){
-      // //           return '#f6d95b'
-      // //         }
-      // //         else{
-      // //           return '#ff704d'
-      // //         }
-      // //       }
-      // //     }
-      // //   }),
-      // //   init: this.__get_stat_for_chart.bind(this),
-      // //   stop: function(payload){
-      // //     // //this.$store.dispatch('stats/flush', payload.stat)
-      // //   }.bind(this),
-      // //   stat: {
-      // //     host: this.host,
-      // //     path: 'cpus_percentage',
-      // //     key: 'os_cpus',
-      // //     length: 1,
-      // //     tabular: true
-      // //     // range: [Date.now() - this.seconds * 1000, Date.now()]
-      // //   },
-      // //   pipeline: {
-      // //     name: 'input.os',
-      // //     path: 'os',
-      // //     // range: true
-      // //   }
-      // // }
-      //
-      // // this.available_charts[this.host+'_os_cpus_percentage_knob'] = {
-      // //   name: this.host+'_os_cpus_percentage_knob',
-      // //   chart: Object.merge(Object.clone(jqueryKnob), {
-      // //     options:{
-      // //       readOnly: true,
-      // //       displayPrevious: true,
-      // //       // thickness: 0.1,
-      // //       width: 120,
-      // //       // skin: 'tron',
-      // //       angleOffset: 235,
-      // //       angleArc: 250,
-      // //       // bgColor: 'black',
-      // //       fgColor: function(percentage){
-      // //         if(percentage > 0 && percentage < 33){
-      // //           return '#86b300'
-      // //         }
-      // //         else if(percentage > 33 && percentage < 66){
-      // //           return '#f6d95b'
-      // //         }
-      // //         else{
-      // //           return '#ff704d'
-      // //         }
-      // //       },
-      // //       inputColor: function(percentage){
-      // //         if(percentage > 0 && percentage < 33){
-      // //           return '#86b300'
-      // //         }
-      // //         else if(percentage > 33 && percentage < 66){
-      // //           return '#f6d95b'
-      // //         }
-      // //         else{
-      // //           return '#ff704d'
-      // //         }
-      // //       }
-      // //     }
-      // //   }),
-      // //   init: this.__get_stat_for_chart.bind(this),
-      // //   stop: function(payload){
-      // //     // //this.$store.dispatch('stats/flush', payload.stat)
-      // //   }.bind(this),
-      // //   stat: {
-      // //     host: this.host,
-      // //     path: 'cpus_percentage',
-      // //     key: 'os_cpus',
-      // //     length: 1,
-      // //     tabular: true
-      // //     // range: [Date.now() - this.seconds * 1000, Date.now()]
-      // //   },
-      // //   pipeline: {
-      // //     name: 'input.os',
-      // //     path: 'os',
-      // //     // range: true
-      // //   }
-      // // }
-      //
-      // /**
-      // * gauge
-      // **/
-
-      // /**
-      // * remove for testing
-      // **/
-      // this.available_charts[this.host+'.os.cpus.percentage_gauge'] = Object.merge(
-      //   this.get_payload(charts_payloads,{
-      //     name: 'os.cpus.percentage',
-      //     host: this.host,
-      //     seconds: 1
-      //   }),
-      //   {
-      //     name: this.host+'.os.cpus.percentage_gauge',
-      //     chart: highchartsVueGauge,
-      //     // init: this.__get_stat_for_chart.bind(this),
-      //     stop: function(payload){
-      //       //this.remove_watcher(payload.name)
-      //       //this.$store.dispatch('stats/flush', payload.stat)
-      //     }.bind(this),
-      //     pipeline: {
-      //       range: true
-      //     }
-      //   }
-      // )
-      //
-      // this.set_chart_visibility(this.host+'.os.cpus.percentage_gauge', true)
-
-      // }
-      //
-      //
-
-      // let blockdevice = new RegExp(this.host+'_os_blockdevices')
-      // let networkInterface = new RegExp(this.host+'_os_networkInterfaces_stats')
-      // let munin = new RegExp(this.host+'_munin_')
-      // let munin_max_range_value = /max/
-      //
-      // let __unwacth_munin = this.$watch('$store.state.tabular_sources', function(val){
-      //   let _merge = {}
-      //   let _merged_charts = {}
-      //
-      //
-      //   Object.each(val, function(stat, key){
-      //     if(munin.test(key)){
-      //       let munin_name = key.replace(munin, '')
-      //       let _path = munin_name.substring(0, munin_name.lastIndexOf('_'))
-      //       let _name = munin_name.substring(munin_name.lastIndexOf('_')+1)
-      //
-      //       if(!_merge[_path]) _merge[_path] = []
-      //
-      //       if(!_merge[_path].contains(_name))
-      //         _merge[_path].push(_name)
-      //
-      //       // let _name = key.substring(key.lastIndexOf('_') + 1)
-      //       // // let prop_name = _name.substr(_name.indexOf('_') + 1)
-      //       // if(!_merge.contains(_name))
-      //       //   _merge.push(_name)
-      //
-      //     }
-      //   }.bind(this))
-      //
-      //   if(Object.getLength(_merge) > 0){
-      //     // console.log('MUNIN',_merge)
-      //      // && (this.dashboard_charts['munin'] || this.dashboard_charts['munin_'+path]){
-      //     __unwacth_munin()
-      //
-      //     Object.each(_merge, function(names, _path){
-      //       let merged_chart_name = this.host+'.munin_'+_path
-      //       /**
-      //       * @removed
-      //       **/
-      //       // Array.each(names, function(_name){
-      //       //   merged_chart_name += '.'+_name
-      //       // })
-      //       debug('this.dashboard_instances', this.dashboard_instances)
-      //
-      //       if(!_merged_charts[merged_chart_name]){
-      //         _merged_charts[merged_chart_name] = Object.merge(
-      //           Object.clone(this.$options.charts_payloads['munin']),
-      //           {
-      //             stat: {
-      //               // sources: [],
-      //               events: [{
-      //                 host: this.host,
-      //                 path: 'munin_'+_path,
-      //                 tabular: true,
-      //               }]
-      //             },
-      //             name: merged_chart_name,
-      //             // chart: Object.clone(dygraph_line_chart),
-      //
-      //             chart: (this.dashboard_instances['munin_'+_path]) ? Object.merge(Object.clone(dygraph_line_chart), Object.clone(this.dashboard_instances['munin_'+_path][names[0]])) : Object.clone(dygraph_line_chart),
-      //           }
-      //         )
-      //
-      //         // _merged_charts[merged_chart_name].chart.interval = 5
-      //         _merged_charts[merged_chart_name].chart.options.labels = ['Time']
-      //         let options = Object.clone(_merged_charts[merged_chart_name].chart.options)
-      //         _merged_charts[merged_chart_name].chart.options = undefined
-      //
-      //         this.$set(this.available_charts, merged_chart_name, Object.merge(_merged_charts[merged_chart_name]))
-      //         this.$set(this.available_charts[merged_chart_name].chart, 'options', options)
-      //
-      //         this.$set(this.available_charts[merged_chart_name].chart.options, 'labels', ['Time'])
-      //
-      //       }
-      //
-      //       Array.each(names, function(_name, _name_index){
-      //         this.available_charts[merged_chart_name].stat.sources.push(
-      //           {type: 'tabular', path:this.host+'_munin_'+_path+'_'+_name}
-      //         )
-      //
-      //         if(munin_max_range_value.test(_name))
-      //           this.$set(this.available_charts[merged_chart_name].chart.options,
-      //             'valueRange',
-      //             [0, this.$store.state.tabular_sources[this.host+'_munin_'+_path+'_'+_name][1]]//[0] is timestamp
-      //           )
-      //
-      //         this.available_charts[merged_chart_name].chart.options.labels.push(_name)
-      //
-      //         if(_name_index === names.length - 1){//last item
-      //
-      //           if(this.available_charts[merged_chart_name].stat.sources.length === 1)
-      //             this.available_charts[merged_chart_name].stat.merged = false
-      //
-      //           /**
-      //           * length : specify length (# of seconds / 5 seconds refresh)
-      //           **/
-      //           this.available_charts[merged_chart_name].stat.length = (this.seconds / 5)
-      //
-      //           this.set_chart_visibility(merged_chart_name, true)
-      //
-      //           console.log('MERGED MUNIN', this.available_charts[merged_chart_name])
-      //
-      //           delete _merged_charts[merged_chart_name]
-      //
-      //
-      //         }
-      //       }.bind(this))
-      //
-      //
-      //
-      //
-      //     }.bind(this))
-      //
-      //
-      //   }
-      //
-      //
-      // }, {deep: true})
-      //
-
-      //
-      // let __unwacth_blockdevices = this.$watch('$store.state.tabular_sources', function(val){
-      //   Object.each(this.$store.state.tabular_sources, function(stat, key){
-      //
-      //     if(blockdevice.test(key) && this.dashboard_charts['os_blockdevices.stats']){
-      //       __unwacth_blockdevices()
-      //
-      //       let _name = key.substring(key.lastIndexOf('_') + 1)
-      //       let chart_name = this.host+'.os_blockdevices.stats.'+_name
-      //
-      //       // //console.log('BLK', chart_name)
-      //
-      //       if(!this.available_charts[chart_name]){
-      //
-      //         this.$set(this.available_charts, chart_name, Object.merge(
-      //           Object.clone(this.$options.charts_payloads['os_blockdevices.stats']),
-      //           {
-      //             stat: {
-      //               sources: [{type: 'tabular', path:this.host+'_os_blockdevices_stats_'+_name}],
-      //             },
-      //             name: chart_name,
-      //             // chart: Object.merge(Object.clone(blockdevices_stats_chart), Object.clone(this.dashboard_charts['os_blockdevices.stats'])),
-      //             chart: Object.merge(Object.clone(dygraph_line_chart), Object.clone(this.dashboard_charts['os_blockdevices.stats'])),
-      //             // chart: Object.clone(this.dashboard_charts['os_blockdevices.stats']),
-      //           })
-      //         )
-      //
-      //         // this.$set(this.blockdevices, _name, 1)
-      //         this.set_chart_visibility(chart_name, true)
-      //       }
-      //     }
-      //   }.bind(this))
-      //
-      // },{deep:true})
-      //
     },
 
     /**
@@ -1401,72 +1082,68 @@ export default {
       if (host) {
         // this.destroy_pipelines(host)
 
-        // Array.each(hosts, function(host){
-        Array.each(host_pipelines_templates, function (pipeline_template) {
-          // Array.each(paths, function(path){//one pipeline per used/visible path
-          //   if(this.$options.visible_paths.contains(path)){
+        // Array.each(host_pipelines_templates, function (pipeline_template) {
 
-          let template = Object.clone(pipeline_template)
+        let template = Object.clone(HostPipeline)
 
-          template.input[0].poll.conn[0].stat_host = host
-          // template.input[0].poll.conn[0].paths = paths
-          // template.input[0].poll.conn[0].paths = [path]
-          let pipeline_id = template.input[0].poll.id
-          template.input[0].poll.id += '-' + host
-          template.input[0].poll.conn[0].id = template.input[0].poll.id
+        template.input[0].poll.conn[0].stat_host = host
+        // template.input[0].poll.conn[0].paths = paths
+        // template.input[0].poll.conn[0].paths = [path]
+        let pipeline_id = template.input[0].poll.id
+        template.input[0].poll.id += '-' + host
+        template.input[0].poll.conn[0].id = template.input[0].poll.id
 
-          let pipe = new Pipeline(template)
+        let pipe = new Pipeline(template)
 
-          /// ///////////////////////////////console.log('$store.state.hosts.all', pipe)
+        /// ///////////////////////////////console.log('$store.state.hosts.all', pipe)
 
-          /**
+        /**
               * start suspended already
               **/
-          // pipe.fireEvent('onSuspend')
+        // pipe.fireEvent('onSuspend')
 
-          // suscribe to 'onRangeDoc
+        // suscribe to 'onRangeDoc
 
-          pipe.inputs[0].addEvent('onRangeDoc', function (doc) {
-            /// /////////////////////////console.log('create_hosts_pipelines onRangeDoc',doc);
+        pipe.inputs[0].addEvent('onRangeDoc', function (doc) {
+          /// /////////////////////////console.log('create_hosts_pipelines onRangeDoc',doc);
 
-            if (this.$store.state.app.freeze === true) {
-              /// ///////////////////////////////console.log('pipe.inputs[0].addEvent(onRangeDoc)')
-              // this.$nextTick(function(){pipe.fireEvent('onSuspend')})
-              this.$store.commit('app/suspend', true)
-              // this.$q.loading.hide()
-              // this.$store.commit('app/pause', true)
-            } else {
-              /// ///////////////////////console.log('create_hosts_pipelines ON_RESUME',pipe.inputs[0].options.id);
+          if (this.$store.state.app.freeze === true) {
+            /// ///////////////////////////////console.log('pipe.inputs[0].addEvent(onRangeDoc)')
+            // this.$nextTick(function(){pipe.fireEvent('onSuspend')})
+            this.$store.commit('app/suspend', true)
+            // this.$q.loading.hide()
+            // this.$store.commit('app/pause', true)
+          } else {
+            /// ///////////////////////console.log('create_hosts_pipelines ON_RESUME',pipe.inputs[0].options.id);
 
-              this.$store.commit('app/suspend', false)//
-
-              /** manually resume **/
-              pipe.fireEvent('onResume')
-
-              // this.$q.loading.hide()
-              // this.$store.commit('app/pause', false)
-            }
-          }.bind(this))
-
-          // this.hosts_pipelines.push(pipe)
-          // this.$store.commit('host_'+host+'/add', {id: pipeline_id, pipeline: pipe})
-          this.$options.pipelines[pipeline_id] = pipe
-
-          // if(range[1] === null){
-          //   range[1] = new Date().getTime()
-          // }
-
-          // pipe.fireEvent('onRange', { Range: 'posix '+ range[0] +'-'+ range[1] +'/*' })
-
-          if (this.$store.state.app.suspend !== true) {
-            /// ///////////////////////console.log('store.state.hosts.current ON_RESUME',this.$store.state.app.suspend);
+            this.$store.commit('app/suspend', false)//
 
             /** manually resume **/
-            // pipe.fireEvent('onResume')
+            pipe.fireEvent('onResume')
+
+            // this.$q.loading.hide()
+            // this.$store.commit('app/pause', false)
           }
-          // }
-          // }.bind(this))
         }.bind(this))
+
+        // this.hosts_pipelines.push(pipe)
+        // this.$store.commit('host_'+host+'/add', {id: pipeline_id, pipeline: pipe})
+        this.$options.pipelines[pipeline_id] = pipe
+
+        // if(range[1] === null){
+        //   range[1] = new Date().getTime()
+        // }
+
+        // pipe.fireEvent('onRange', { Range: 'posix '+ range[0] +'-'+ range[1] +'/*' })
+
+        if (this.$store.state.app.suspend !== true) {
+          /// ///////////////////////console.log('store.state.hosts.current ON_RESUME',this.$store.state.app.suspend);
+
+          /** manually resume **/
+          // pipe.fireEvent('onResume')
+        }
+
+        // }.bind(this))
 
         // }.bind(this))
       }

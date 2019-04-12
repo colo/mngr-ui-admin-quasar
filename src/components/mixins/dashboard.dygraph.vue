@@ -1,6 +1,3 @@
-<template>
-  <div></div>
-</template>
 
 <script>
 // import the module here instead of in `src/store/index.js`
