@@ -72,13 +72,13 @@
         <!-- <q-btn dense flat round icon="menu"  @click="right = !right" /> -->
       </q-toolbar>
       <q-toolbar inset>
-        <!-- <q-breadcrumbs active-color="info" class="text-grey">
+        <q-breadcrumbs active-color="info" class="text-grey">
           <q-breadcrumbs-el
           v-for="(breadcrumb, index) in breadcrumbs"
           :key="index"
           v-bind="breadcrumb"
           />
-        </q-breadcrumbs> -->
+        </q-breadcrumbs>
       </q-toolbar>
     </q-header>
 
@@ -100,12 +100,12 @@
     <!-- overlay -->
       <q-list :dark="$store.state.app.theme.current === 'slate'">
         <!-- <q-item-label header>Essential Links</q-item-label> -->
-        <q-item clickable to="/dashboard">
+        <q-item clickable to="/hosts">
           <q-item-section avatar>
             <q-icon name="fas fa-tachometer-alt" class="text-grey"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-grey">Dashboard</q-item-label>
+            <q-item-label class="text-grey">Hosts</q-item-label>
             <!-- <q-item-label caption>v1.quasar-framework.org</q-item-label> -->
           </q-item-section>
         </q-item>

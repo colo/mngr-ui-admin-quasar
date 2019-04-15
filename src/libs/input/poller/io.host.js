@@ -8,9 +8,9 @@ const App = require('node-app-socket.io-client/index')
 // import { throttle } from 'quasar'
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-ui-admin-lte:libs:input:io.host'),
-  debug_internals = Debug('mngr-ui-admin-lte:libs:input:io.host:Internals'),
-  debug_events = Debug('mngr-ui-admin-lte:libs:input:io.host:Events')
+const debug = Debug('mngr-ui:libs:input:io.host'),
+  debug_internals = Debug('mngr-ui:libs:input:io.host:Internals'),
+  debug_events = Debug('mngr-ui:libs:input:io.host:Events')
 
 import HostsIO from '@etc/hosts.io'
 
@@ -321,12 +321,12 @@ export default new Class({
 
       if (this.registered === false) {
         this.registered = true
-        // this.io.emit('on', [
-        //   {host: this.options.stat_host, prop: 'paths', format: 'stat'},
-        //   {host: this.options.stat_host, prop: 'data', format: 'stat'},
-        //   {host: this.options.stat_host, prop: 'data', format: 'tabular'},
-        //   {host: this.options.stat_host, prop: 'data_range'}
-        // ])
+        this.io.emit('on', [
+          {host: this.options.stat_host, prop: 'paths', format: 'stat'},
+          {host: this.options.stat_host, prop: 'data', format: 'stat'},
+          {host: this.options.stat_host, prop: 'data', format: 'tabular'},
+          {host: this.options.stat_host, prop: 'data_range'}
+        ])
       }
     }
     // this.charts(socket, next, {host: host, charts: charts})
@@ -379,23 +379,23 @@ export default new Class({
     this.io.emit('on', [
       // {host: this.options.stat_host, prop: 'data_range'},
       { host: this.options.stat_host, prop: 'instances' },
-      { host: this.options.stat_host, prop: 'paths', format: 'stat' },
-      { host: this.options.stat_host, prop: 'data', format: 'stat' },
-      { host: this.options.stat_host, prop: 'data', format: 'tabular' }
+      // { host: this.options.stat_host, prop: 'paths', format: 'stat' },
+      // { host: this.options.stat_host, prop: 'data', format: 'stat' },
+      // { host: this.options.stat_host, prop: 'data', format: 'tabular' }
     ])
     this.io.emit('/', { host: this.options.stat_host, prop: 'instances' })
 
-    // this.io.emit('on', {host: this.options.stat_host, prop: 'paths', format: 'stat'})
-
-    this.io.emit('/', { host: this.options.stat_host, prop: 'data_range' })
-
-    this.io.emit('/', { host: this.options.stat_host, prop: 'paths', format: 'stat' })
-
-    // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'stat'})
-    this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'stat' })
-
-    // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'tabular'})
-    this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'tabular' })
+    // // this.io.emit('on', {host: this.options.stat_host, prop: 'paths', format: 'stat'})
+    //
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'data_range' })
+    //
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'paths', format: 'stat' })
+    //
+    // // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'stat'})
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'stat' })
+    //
+    // // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'tabular'})
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'tabular' })
 
     // })
 

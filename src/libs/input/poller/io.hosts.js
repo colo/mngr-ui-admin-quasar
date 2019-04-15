@@ -7,9 +7,9 @@ const App = require ( 'node-app-socket.io-client/index' )
 
 import * as Debug from "debug"
 
-const debug = Debug("mngr-ui-admin-lte:libs:input:io.hosts"),
-      debug_internals = Debug("mngr-ui-admin-lte:libs:input:io.hosts:Internals"),
-      debug_events = Debug("mngr-ui-admin-lte:libs:input:io.hosts:Events");
+const debug = Debug("mngr-ui:libs:input:io.hosts"),
+      debug_internals = Debug("mngr-ui:libs:input:io.hosts:Internals"),
+      debug_events = Debug("mngr-ui:libs:input:io.hosts:Events");
 
 import store from 'src/store'
 

@@ -16,10 +16,10 @@ const routes = [
       },
 
       {
-        path: 'dashboard',
-        component: () => import('pages/dashboard/default'),
+        path: 'hosts',
+        component: () => import('pages/dashboards/hosts'),
         meta: {
-          breadcrumb: { label: 'Dashboard', icon: 'fas fa-tachometer-alt' }
+          breadcrumb: { label: 'Hosts', icon: 'fas fa-tachometer-alt' }
         },
 
         // Now we define the sub-routes.
@@ -29,8 +29,8 @@ const routes = [
         // (need to specify it in layout)
         children: [
           {
-            path: 'host/:host',
-            component: () => import('pages/dashboard/host'),
+            path: ':host',
+            component: () => import('pages/dashboards/host'),
             meta: {
               breadcrumb: { label: 'Host', icon: 'widgets' }
             }

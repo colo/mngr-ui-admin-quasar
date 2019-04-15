@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import VuexPersistence from 'vuex-persist'
 
 import app from './app'
+import hosts from './hosts'
 
 Vue.use(Vuex)
 
@@ -24,7 +25,8 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     plugins: [vuexLocal.plugin],
     modules: {
-      app
+      app,
+      hosts
     },
 
     // enable strict mode (adds overhead!)

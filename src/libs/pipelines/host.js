@@ -11,9 +11,9 @@ let buffer = {}
 
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-ui-admin-lte:libs:pipelines:host'),
-  debug_internals = Debug('mngr-ui-admin-lte:libs:pipelines:host:Internals'),
-  debug_events = Debug('mngr-ui-admin-lte:libs:pipelines:host:Events')
+const debug = Debug('mngr-ui:libs:pipelines:host'),
+  debug_internals = Debug('mngr-ui:libs:pipelines:host:Internals'),
+  debug_events = Debug('mngr-ui:libs:pipelines:host:Events')
 
 export default {
   input: [

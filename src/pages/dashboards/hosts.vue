@@ -1,34 +1,28 @@
 <template>
   <q-page class="bg-secondary">
 
-    <!-- <dashboard-menu /> -->
+    <dashboard-menu />
+    <!-- <div class="q-pa-none row justify-end"> -->
+    <div class="q-pa-md row">
 
-    <div class="q-pa-md row justify-end">
-      <router-view />
       <!-- <div class="column items-end"> -->
-        <!-- <div class="col">
-         .col
-       </div> -->
-       <div class="col-8">
-
+      <!-- <div class="col text-grey">
+        .col
+      </div>
+      <div class="col-8 text-grey">
+        qqewqwe
       </div>
 
-       <div class="col-auto gt-sm">
-         <q-btn
-           flat
-           dense
-           round
-           to="/dashboard/host/colo"
-           aria-label="Colo"
-           icon="menu"
-           class="text-grey"
-         >
-         </q-btn>
-      </div>
-      <!-- </div> -->
+      <div
+        v-if="!$route.params.host"
+        class="col-auto gt-sm text-grey"
+      >
+        asdasd
+      </div> -->
+
     </div>
-    <!-- <div class="text-white">hello</div> -->
-    <!-- <img alt="Quasar logo" src="~assets/quasar-logo-full.svg"> -->
+    <router-view />
+
   </q-page>
 </template>
 
@@ -41,14 +35,15 @@ const debug = Debug('mngr-ui:pages:dashboard:default')
 // const debug_events = Debug('mngr-ui:pages:dashboard:default:Events')
 
 // import dashboardMixinDygraph from '@mixins/dashboard.dygraph'
+import dashboardMixin from '@mixins/dashboard'
 
 export default {
 
-  // mixins: [dashboardMixinDygraph],
+  mixins: [dashboardMixin],
 
   data () {
     return {
-      id: 'default'
+      id: 'hosts'
 
     }
   },

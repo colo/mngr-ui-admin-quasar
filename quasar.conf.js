@@ -11,6 +11,7 @@ module.exports = function (ctx) {
       'i18n',
       'axios',
       'eventbus',
+      'vue-observe-visibility',
       // 'mootools'
       // 'addressbar-color'
     ],
@@ -61,7 +62,8 @@ module.exports = function (ctx) {
         'QCheckbox',
         'QToggle',
         'QCardSection',
-        'QExpansionItem'
+        'QExpansionItem',
+        'QResizeObserver'
       ],
 
       directives: [
@@ -74,7 +76,7 @@ module.exports = function (ctx) {
         'AddressbarColor'
       ],
 
-      iconSet: 'fontawesome-v5',
+      // iconSet: 'fontawesome-v5',
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language
     },

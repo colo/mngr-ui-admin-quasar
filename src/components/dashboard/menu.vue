@@ -3,13 +3,14 @@
     v-model="drawer"
     side="right"
     content-class="bg-secondary"
+    class="gt-sm"
+    :width="280"
   >
   <q-card
     :dark="$store.state.app.theme.current === 'slate'"
     square
     flat
     class="bg-secondary"
-    style="width:300px"
   >
     <q-tabs
       v-model="tab"
@@ -18,8 +19,8 @@
       indicator-color="negative"
       narrow-indicator
     >
-      <q-tab name="mails" label="Mails" />
-      <q-tab name="alarms" label="Settings" />
+      <q-tab name="charts" label="Charts" />
+      <q-tab name="settings" label="Settings" />
 
     </q-tabs>
 
@@ -31,20 +32,24 @@
       class="bg-secondary"
       :dark="$store.state.app.theme.current === 'slate'"
     >
-      <q-tab-panel name="mails" :dark="$store.state.app.theme.current === 'slate'">
+      <q-tab-panel name="charts" :dark="$store.state.app.theme.current === 'slate'">
         <!-- <div class="text-h6">Mails</div>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. -->
-        <q-list :dark="$store.state.app.theme.current === 'slate'">
+        <q-list :dark="$store.state.app.theme.current === 'slate'" class="bg-secondary q-pa-none q-ma-none">
           <q-expansion-item
+            dense-toggle
+            dense
             group="somegroup"
-            expand-separator
             icon="mail"
             label="Inbox"
-            caption="5 unread emails"
             default-opened
-            :header-inset-level="0.1"
-            :content-inset-level="0.2"
+            :header-inset-level="0"
+            :content-inset-level="0.1"
+            class="bg-secondary"
           >
+          <!-- expand-separator -->
+          <!-- caption="5 unread emails" -->
+
             <q-card class="bg-secondary">
               <q-card-section>
                 Today
@@ -106,14 +111,17 @@
           </q-expansion-item>
 
           <q-expansion-item
+            dense-toggle
+            dense
             group="somegroup"
-            expand-separator
             icon="mail"
             label="Inbox"
-            caption="5 unread emails"
-            :header-inset-level="0.1"
-            :content-inset-level="0.2"
+            :header-inset-level="0"
+            :content-inset-level="0.1"
           >
+          <!-- expand-separator -->
+          <!-- caption="5 unread emails" -->
+
             <q-card class="bg-secondary">
               <q-card-section>
                 Today
@@ -126,7 +134,7 @@
 
       </q-tab-panel>
 
-      <q-tab-panel name="alarms" :dark="$store.state.app.theme.current === 'slate'">
+      <q-tab-panel name="settings" :dark="$store.state.app.theme.current === 'slate'">
         <q-list :dark="$store.state.app.theme.current === 'slate'">
           <q-item-label header>User Controls</q-item-label>
 
@@ -295,7 +303,7 @@ export default {
     return {
 
       drawer: true,
-      tab: 'mails',
+      tab: 'charts',
 
       check1: true,
       check2: false,

@@ -1,7 +1,58 @@
+<template>
+  <q-list
+    :dark="$store.state.app.theme.current === 'slate'"
+    style="width: 100%"
+    >
+    <template v-for="(chart, name) in available_charts">
+      <q-expansion-item
+        :id="name+'-collapsible'"
+        :key="name+'-collapsible'"
+        expand-separator
+        :label="name"
+        default-opened
+        :header-inset-level="0"
+        :content-inset-level="0"
+
+      >
+        <!-- @show="showCollapsible"
+        @hide="hideCollapsible" -->
+      <!-- icon="mail" -->
+      <!-- caption="5 unread emails" -->
+        <q-resize-observer :id="name+'-resize-observer'" @resize="(size) => {onResize(size, name)}" :debounce="200"/>
+        <q-card class="bg-secondary">
+          <q-card-section class="q-px-none">
+
+            <component
+              :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
+              v-if="charts[name]"
+              :dashboard="host"
+              :wrapper="chart.wrapper"
+              :ref="name"
+              :id="name"
+              :EventBus="$eventbus"
+              :chart="chart.chart"
+              :stat="{
+                range: range,
+                length: chart.stat.length,
+                merged: chart.stat.merged,
+                data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
+              }"
+            >
+            </component>
+
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+  </template>
+
+  </q-list>
+</template>
 
 <script>
 
-import dashboardMenu from '@components/dashboard/menu.vue'
+// import dashboardMenu from '@components/dashboard/menu.vue'
+
+// import { event } from 'quasar'
 
 import { EventBus } from 'boot/eventbus'
 
@@ -62,7 +113,7 @@ import dygraph_line_chart from 'mngr-ui-admin-charts/defaults/dygraph.line'
 // import charts_payloads from '@etc/charts.payloads'
 import host_charts_payloads from '@etc/host.charts.payloads'
 
-import dashboard from 'components/mixins/dashboard.dygraph'
+import dashboardDygraphMixin from 'components/mixins/dashboard.dygraph'
 
 const SECOND = 1000
 const MINUTE = SECOND * 60
@@ -70,7 +121,7 @@ const HOUR = MINUTE * 60
 const DAY = HOUR * 24
 
 export default {
-  mixins: [dashboard],
+  mixins: [dashboardDygraphMixin],
   // components: {
   //   // AdminLteBoxSolid,
   //   // AdminLteDashboardHostSummary,
@@ -124,7 +175,12 @@ export default {
 
   data () {
     return {
-      id: 'host',
+      // id: 'host',
+      // event: event,
+      // available_charts: {},
+      //
+      // stat_init: false,
+      // tabular_init: false,
 
       daterangepicker: {
         opens: 'right',
@@ -194,8 +250,10 @@ export default {
       //
       // },
       host: function (state) {
-        if (state.hosts.current || this.$route.params.host) {
-          let host = state.hosts.current || this.$route.params.host
+        // if (state.hosts.current || this.$route.params.host) {
+        //   let host = state.hosts.current || this.$route.params.host
+        if (this.$route.params.host) {
+          let host = this.$route.params.host
           this.id = host
           return host
         } else {
@@ -204,11 +262,14 @@ export default {
       }
 
     })
+    // id: function(){
+    //
+    // }
 
   ),
-  created: function () {
-    this.id = this.id
-  },
+  // created: function () {
+  //   this.id = this.id
+  // },
 
   // updated: function(){
   //   debug('updated', this.$route.params.host)
@@ -241,66 +302,133 @@ export default {
       // console.log('__set_source step', this.$options[type+'_sources'][payload.key].step, payload.step)
       // debug('__set_source', type, this.$options[type+'_sources'])
     },
+    /**
+    * @overides dashboard.vue mixin
+    * does use $options.[tabular|stat]_stats instead of vuex, for performance
+    **/
     __process_dashboard_data: function (payload) {
       debug('__process_dashboard_data', payload)
-      // if(payload.range === true)
-      // //console.log('recived doc via Event stats', payload)
+      if (payload && payload.host === this.host) {
+        // if(payload.range == true)
+        // //console.log('recived doc via Event stats', payload)
 
-      // let type = (payload.tabular === true) ? 'tabular' : 'stat'
-      let { type } = payload
+        // let type = (payload.tabular == true) ? 'tabular' : 'stat'
+        let { type } = payload
 
-      let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
-      // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
-      let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
-      let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
+        let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
+        // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
+        let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
+        let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
 
-      let counter = 0
-      if (payload[type]) {
-        if (Object.getLength(payload[type]) > 0) {
-          Object.each(payload[type], function (data, path) {
-            let new_path
-            let new_val
-            if (Array.isArray(data)) {
-              // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
+        let counter = 0
+        if (payload[type]) {
+          if (Object.getLength(payload[type]) > 0) {
+            Object.each(payload[type], function (data, path) {
+              let new_path
+              let new_val
+              if (Array.isArray(data)) {
+                // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
 
-              if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
-                // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path, value: data})
-                this.__set_source(type, { key: payload.key + '_' + path, value: data, step: payload.step })
-              }
-            } else if (data) {
-              Object.each(data, function (value, key) {
-                if (Array.isArray(value)) {
-                  // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
-
-                  if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
-                    // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key, value: value})
-                    this.__set_source(type, { key: payload.key + '_' + path + '_' + key, value: value, step: payload.step })
-                  }
-                } else {
-                  // 3rd level, there is no need for more
-                  Object.each(value, function (val, sub_key) {
-                    if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
-                      // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key+'_'+sub_key, value: val})
-                      this.__set_source(type, { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val, step: payload.step })
-                    }
-                  }.bind(this))
+                if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
+                  // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path, value: data})
+                  this.__set_source(type, { key: payload.key + '_' + path, value: data, step: payload.step })
                 }
-              }.bind(this))
-            }
+              } else if (data) {
+                Object.each(data, function (value, key) {
+                  if (Array.isArray(value)) {
+                    // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
 
-            if (counter === Object.getLength(payload[type]) - 1) {
-              this.$set(this, init, true)
-              this.$emit(type + '_sources')
-            }
+                    if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
+                      // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key, value: value})
+                      this.__set_source(type, { key: payload.key + '_' + path + '_' + key, value: value, step: payload.step })
+                    }
+                  } else {
+                    // 3rd level, there is no need for more
+                    Object.each(value, function (val, sub_key) {
+                      if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
+                        // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key+'_'+sub_key, value: val})
+                        this.__set_source(type, { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val, step: payload.step })
+                      }
+                    }.bind(this))
+                  }
+                }.bind(this))
+              }
 
-            counter++
-          }.bind(this))
+              if (counter === Object.getLength(payload[type]) - 1) {
+                this.$set(this, init, true)
+                this.$emit(type + '_sources')
+              }
+
+              counter++
+            }.bind(this))
+          }
+          // else{
+          //   this.$set(this, init, true)
+          // }
         }
-        // else{
-        //   this.$set(this, init, true)
-        // }
       }
     },
+    // __process_dashboard_data: function (payload) {
+    //   debug('__process_dashboard_data', payload)
+    //   // if(payload.range === true)
+    //   // //console.log('recived doc via Event stats', payload)
+    //
+    //   // let type = (payload.tabular === true) ? 'tabular' : 'stat'
+    //   let { type } = payload
+    //
+    //   let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
+    //   // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
+    //   let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
+    //   let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
+    //
+    //   let counter = 0
+    //   if (payload[type]) {
+    //     if (Object.getLength(payload[type]) > 0) {
+    //       Object.each(payload[type], function (data, path) {
+    //         let new_path
+    //         let new_val
+    //         if (Array.isArray(data)) {
+    //           // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
+    //           // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path)
+    //
+    //           if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
+    //             this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path, value: data })
+    //           }
+    //         } else {
+    //           Object.each(data, function (value, key) {
+    //             if (Array.isArray(value)) {
+    //               // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
+    //               // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key)
+    //
+    //               if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
+    //                 this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key, value: value })
+    //               }
+    //             } else {
+    //               // 3rd level, there is no need for more
+    //               Object.each(value, function (val, sub_key) {
+    //                 // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key + '_' + sub_key)
+    //
+    //                 if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
+    //                   this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val })
+    //                 }
+    //               }.bind(this))
+    //             }
+    //           }.bind(this))
+    //         }
+    //
+    //         if (counter === Object.getLength(payload[type]) - 1) {
+    //           this.$set(this, init, true)
+    //           this.$emit(type + '_sources')
+    //         }
+    //
+    //         counter++
+    //       }.bind(this))
+    //     }
+    //     // else{
+    //     //   this.$set(this, init, true)
+    //     // }
+    //   }
+    // },
 
     /**
     * if remaining !== false => return os_mounts.1, else => os_mounts
@@ -1029,12 +1157,13 @@ export default {
       }.bind(this)
 
       let __tabular_sources_event = function () {
-        //   __unwatch_tabular_sources()
+        debug('$options.tabular_sources', this.$options.tabular_sources, this.id)
+
         if (
           this.$options.tabular_sources &&
           this.available_charts &&
           this.dashboard_instances &&
-          this.$store.state['dashboard_' + this.host].paths.length > 0
+          this.$store.state['dashboard_' + this.id].paths.length > 0
         ) {
           debug('$options.tabular_sources', this.$options.tabular_sources, this.id)
           __create_from_tabular_sources(this.$options.tabular_sources)
