@@ -246,9 +246,25 @@ export default {
       if (this.ready === true && data && data[0]) {
         // //console.log('updateOptions', this.id, data)
 
+        // this.updateOptions(
+        //   data,
+        //   Object.merge(this.$options.chart_options, { 'dateWindow': this.$options.graph.xAxisExtremes() }),
+        //   false
+        // )
+
+        let end = data[data.length - 1][0]
+        let start
+        if (!this.chart_data_length) {
+          start = data[0][0]
+        } else {
+          start = end - (this.chart_data_length * 1000)
+        }
+
+        debug('update start - end', this.chart_data_length, start, end)
+
         this.updateOptions(
           data,
-          Object.merge(this.$options.chart_options, { 'dateWindow': this.$options.graph.xAxisExtremes() }),
+          Object.merge(this.$options.chart_options, { 'dateWindow': [start, end] }),
           false
         )
       }
@@ -301,6 +317,8 @@ export default {
         //   block_redraw
         // );
         let selection = (this.chart.skip && this.chart.skip > 0) ? this.chart.skip : 1
+
+        debug('updateOptions selection', data.length, selection)
 
         this.$options.graph.setSelection(this.$options.graph.numRows() - selection, {}, false)
       }

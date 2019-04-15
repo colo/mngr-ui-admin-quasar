@@ -25,6 +25,10 @@ export default {
       type: [Array],
       default: () => ([])
     },
+    chart_data_length: {
+      type: [Number]
+      // default: () => ([])
+    },
     freezed: {
       type: [Boolean],
       default: () => (false)

@@ -9,6 +9,7 @@
     :EventBus="EventBus"
     :chart="chart"
     :chart_data="tabular.data"
+    :chart_data_length="stat.length"
     v-bind="wrapper.opts"
   >
   </component>
@@ -272,8 +273,6 @@ export default {
           )
 
       ) {
-        debug('graph update_chart_stat updating', this.id)
-
         if (this.$refs[name] && typeof this.$refs[name].update === 'function' && this.$options.tabular.data.length > 0) {
           if (inmediate === true) {
             this.$refs[name].update(this.$options.tabular.data)
@@ -286,11 +285,10 @@ export default {
           } else {
             frameDebounce(this.$set(this, 'tabular', this.$options.tabular))
           }
-
-          this.$options.tabular.data = [[]]
-
-          // this.$set(this.tabular, 'data', [[]])
         }
+        debug('graph update_chart_stat updating', this.id, this.tabular.data.length, this.$options.tabular.data.length)
+
+        this.$options.tabular.data = [[]]
 
         if (inmediate === true) {
           this.$options.tabular.lastupdate = 0
