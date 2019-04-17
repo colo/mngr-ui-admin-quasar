@@ -171,44 +171,44 @@ export default {
         }
       }
 
-    }),
-    {
-      all_init: function () {
-        debug('all_init',
-          this.id,
-          this.dashboard_paths !== undefined,
-          this.dashboard_instances !== undefined,
-          this.stat_init === true,
-          this.tabular_init === true
-        )
-
-        return (
-          this.id !== undefined &&
-          this.dashboard_paths !== undefined &&
-          this.dashboard_instances !== undefined &&
-          this.stat_init === true &&
-          this.tabular_init === true
-        )
-
-        // if(
-        //   // this.dashboard_charts != undefined &&
-        //   this.id !== undefined
-        //   && this.dashboard_paths != undefined
-        //   && this.dashboard_instances != undefined
-        //   && this.stat_init == true
-        //   && this.tabular_init == true
-        //   // && this.range.length > 0
-        //   // && Object.getLength(this.$store.state.stats_sources) > 0
-        //   // && Object.getLength(this.$store.state.tabulars_sources) > 0
-        // ){
-        // // if(this.dashboard_charts != undefined){
-        //   return true
-        // }
-        // else{
-        //   return false
-        // }
-      }
-    }
+    })
+    // {
+    //   all_init: function () {
+    //     debug('all_init',
+    //       this.id,
+    //       this.dashboard_paths !== undefined,
+    //       this.dashboard_instances !== undefined,
+    //       this.stat_init === true,
+    //       this.tabular_init === true
+    //     )
+    //
+    //     return (
+    //       this.id !== undefined &&
+    //       this.dashboard_paths !== undefined &&
+    //       this.dashboard_instances !== undefined &&
+    //       this.stat_init === true &&
+    //       this.tabular_init === true
+    //     )
+    //
+    //     // if(
+    //     //   // this.dashboard_charts != undefined &&
+    //     //   this.id !== undefined
+    //     //   && this.dashboard_paths != undefined
+    //     //   && this.dashboard_instances != undefined
+    //     //   && this.stat_init == true
+    //     //   && this.tabular_init == true
+    //     //   // && this.range.length > 0
+    //     //   // && Object.getLength(this.$store.state.stats_sources) > 0
+    //     //   // && Object.getLength(this.$store.state.tabulars_sources) > 0
+    //     // ){
+    //     // // if(this.dashboard_charts != undefined){
+    //     //   return true
+    //     // }
+    //     // else{
+    //     //   return false
+    //     // }
+    //   }
+    // }
   ),
 
   methods: {
@@ -282,7 +282,8 @@ export default {
       })
       // console.log('fire_pipelines_events',this.$options.__pipelines_events, _events_paths, this.paths, Object.getLength(this.available_charts))
 
-      if (this.all_init && Object.getLength(this.$options.__pipelines_events)) {
+      // if (this.all_init && Object.getLength(this.$options.__pipelines_events)) {
+      if (Object.getLength(this.$options.__pipelines_events)) {
         if (process.env.DEV) debug('fire_pipelines_events', this.$options.__pipelines_events, _events_paths, this.paths, Object.getLength(this.available_charts))
 
         // console.log('fire_pipelines_events',this.$options.__pipelines_events, this.paths)
@@ -487,14 +488,14 @@ export default {
       // this.$store.commit('dashboard_'+this.id+'/instances', instances)
     },
     __process_dashboard_instances: function (doc) {
-      if (process.env.DEV) debug('__process_dashboard_instances', doc)
+      if (process.env.DEV) debug('__process_dashboard_instances', doc, this.host === doc.host, doc.instances, doc.instances !== null)
       let instances = {}
-      if (this.host === doc.host && doc.instances && doc.instances !== null && Object.getLength(doc.instances) > 2) { // last one is a BUG
+      if (this.host === doc.host && doc.instances && doc.instances !== null && Object.getLength(doc.instances) >= 1) { // last one is a BUG
         // this.$eventbus.$off('instances', this.__process_dashboard_instances)
 
         Object.each(doc.instances, function (instance, name) {
-          instances[this.host + '_' + name] = instance
-        }.bind(this))
+          instances[doc.host + '_' + name] = instance
+        })
 
         if (this.id) { this.$store.commit('dashboard_' + this.id + '/instances', instances) }
       }
@@ -721,21 +722,21 @@ export default {
       let __init = function (next) {
         // this.set_range(moment().subtract(10, 'minute'), moment())
 
-        if (this.all_init === true) {
-          this.__init_charts()
-          this.$nextTick(this.fire_pipelines_events())
-        } else {
-          let unwatch_all_init = this.$watch('all_init', function (val) {
-            if (val === true) {
-              if (process.env.DEV) debug('watch all_init', val)
-
-              unwatch_all_init()
-
-              this.__init_charts()
-              this.$nextTick(this.fire_pipelines_events())
-            }
-          }, { deep: true })// watcher
-        }
+        // if (this.all_init === true) {
+        this.__init_charts()
+        this.$nextTick(this.fire_pipelines_events())
+        // } else {
+        //   let unwatch_all_init = this.$watch('all_init', function (val) {
+        //     if (val === true) {
+        //       if (process.env.DEV) debug('watch all_init', val)
+        //
+        //       unwatch_all_init()
+        //
+        //       this.__init_charts()
+        //       this.$nextTick(this.fire_pipelines_events())
+        //     }
+        //   }, { deep: true })// watcher
+        // }
 
         if (next) { next() }
       }.bind(this)

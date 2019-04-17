@@ -218,7 +218,7 @@ export default {
       **/
       range: function (state) {
         // console.log('EVENTS', this.id)
-        debug('computed range', state['dashboard_' + this.id].range)
+        // debug('computed range', state['dashboard_' + this.id].range)
 
         if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].range.length > 0) {
           return state['dashboard_' + this.id].range
@@ -747,7 +747,9 @@ export default {
 
           if (
             !this.available_charts[source] &&
-            this.dashboard_instances[source]
+            this.dashboard_instances[source] &&
+            this.$options['tabular_sources'][source] &&
+            this.$options['stat_sources']
             // && this.$store.state['dashboard_'+this.host].paths.length > 0
             // && this.__white_black_lists_filter(whitelist, blacklist, source)
           ) {
@@ -1157,21 +1159,24 @@ export default {
       }.bind(this)
 
       let __tabular_sources_event = function () {
-        debug('$options.tabular_sources', this.$options.tabular_sources, this.id)
+        debug('$options.tabular_sources', this.$options.tabular_sources, this.$store.state['dashboard_' + this.id].instances, this.$store.state['dashboard_' + this.id].paths.length)
 
         if (
           this.$options.tabular_sources &&
-          this.available_charts &&
+          // this.available_charts &&
           this.dashboard_instances &&
           this.$store.state['dashboard_' + this.id].paths.length > 0
         ) {
-          debug('$options.tabular_sources', this.$options.tabular_sources, this.id)
+          debug('$options.tabular_sources TRUE', this.$options.tabular_sources, this.id)
           __create_from_tabular_sources(this.$options.tabular_sources)
           __create_os_procs_percentage_cpu(this.$options.tabular_sources)
           __create_os_networkInterfaces_stats_packets_drop_err(this.$options.tabular_sources)
           __create_os_mounts(this.$options.tabular_sources)
 
-          this.$off('tabular_sources', __tabular_sources_event)
+          /**
+          * should we turn it off
+          **/
+          // this.$off('tabular_sources', __tabular_sources_event)
         }
       }.bind(this)
 
@@ -1182,7 +1187,7 @@ export default {
 
         if (
           this.$options.stat_sources &&
-          this.available_charts &&
+          // this.available_charts &&
           this.dashboard_instances &&
           this.$store.state['dashboard_' + this.host].paths.length > 0
         ) {
@@ -1190,6 +1195,9 @@ export default {
           __create_from_stat_sources(this.$options.stat_sources)
           __create_freemem(this.$options.stat_sources)
 
+          /**
+          * should we turn it off
+          **/
           this.$off('stat_sources', __stat_sources_event)
         }
       }.bind(this)
