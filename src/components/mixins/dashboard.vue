@@ -114,6 +114,13 @@ export default {
 
   computed: Object.merge(
     mapState({
+      dygraph_smoothness: function (state) {
+        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.dygraph.smooth) {
+          return state['dashboard_' + this.id].options.dygraph.smooth
+        } else {
+          return false
+        }
+      },
       // events: state => state.dashboard.events.list,
       theme: function (state) {
         return state.app.theme.current
@@ -240,7 +247,7 @@ export default {
     __dashboard_module: function (id, old) {
       debug('__dashboard_module', id, old)
 
-      if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) }
+      // if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) }
 
       if (id && !this.$store.state['dashboard_' + id]) { this.$store.registerModule('dashboard_' + id, Object.clone(dashboardStoreModule)) }
     },

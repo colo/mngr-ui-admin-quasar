@@ -212,13 +212,7 @@ export default {
     mapState({
       // modules_blacklist: state => state.hosts.modules_blacklist,
       // modules_whitelist: state => state.hosts.modules_whitelist,
-      smoothness: function (state) {
-        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.dygraph.smooth) {
-          return state['dashboard_' + this.id].options.dygraph.smooth
-        } else {
-          return false
-        }
-      },
+
       /**
       * @overrides mixins/dashboard
       **/
@@ -268,8 +262,10 @@ export default {
       }
 
     })
-    // id: function(){
-    //
+    // {
+    //   dygraph_smoothness: function () {
+    //     debug('dygraph_smoothness', this.$parent)
+    //   }
     // }
 
   ),
@@ -543,7 +539,7 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
 
             debug(source + ' skip', this.available_charts[source].chart)
 
@@ -646,7 +642,7 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
 
             this.set_chart_visibility(source, true)
 
@@ -734,7 +730,7 @@ export default {
           * set color based on current theme
           **/
           this.__set_chart_color(source)
-          this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+          this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
 
           this.set_chart_visibility(source, true)
 
@@ -855,7 +851,7 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
 
             this.set_chart_visibility(source, true)
 
@@ -990,7 +986,7 @@ export default {
                   * set color based on current theme
                   **/
                   this.__set_chart_color(merged_chart_name)
-                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.smoothness)
+                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.dygraph_smoothness)
 
                   this.set_chart_visibility(merged_chart_name, true)
 
@@ -1157,7 +1153,7 @@ export default {
                   * set color based on current theme
                   **/
                   this.__set_chart_color(merged_chart_name)
-                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.smoothness)
+                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.dygraph_smoothness)
 
                   this.set_chart_visibility(merged_chart_name, true)
 

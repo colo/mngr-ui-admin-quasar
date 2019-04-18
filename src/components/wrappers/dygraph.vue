@@ -44,6 +44,7 @@ export default {
 
   chart_options: {},
   __unwatch_options: undefined,
+  __unwatch_smoth: undefined,
 
   props: {
     EventBus: {
@@ -121,13 +122,7 @@ export default {
     destroy: function () {
       /// /////console.log('dygraph destroy', this.id)
 
-      if (this.$options.graph && typeof this.$options.graph.destroy === 'function') {
-        // //////////console.log('destroying ...', this.id)
-        this.$options.graph.destroy()
-      }
-
-      this.$options.graph = undefined
-      this.ready = false
+      this.__graph_destroy()
 
       if (this.$options.__unwatcher) {
         this.$options.__unwatcher()
@@ -139,6 +134,15 @@ export default {
         this.$options.__unwatch_options = undefined
       }
     },
+    __graph_destroy () {
+      if (this.$options.graph && typeof this.$options.graph.destroy === 'function') {
+        // //////////console.log('destroying ...', this.id)
+        this.$options.graph.destroy()
+      }
+
+      this.$options.graph = undefined
+      this.ready = false
+    },
     create () {
       // console.log('create dygraph', this.id, this.chart)
 
@@ -148,12 +152,23 @@ export default {
       } else {
         let unwatch = this.$watch('chart', function (val) {
           if (val && Object.getLength(val) > 0 && val.options) {
+            this.__graph_destroy()
             this.__create_chart()
             // this.create()
             unwatch()
           }
         })
       }
+
+      this.$options.__unwatch_smoth = this.$watch('chart.smooth', function (val) {
+        debug('chart.smooth', this.id, val)
+        // if (val && Object.getLength(val) > 0 && val.options) {
+        this.__graph_destroy()
+        this.__create_chart()
+        // this.create()
+        // unwatch()
+        // }
+      }, { deep: true })
     },
     __create_chart () {
       // let unwatch_options = this.$watch('chart.options', function(val){

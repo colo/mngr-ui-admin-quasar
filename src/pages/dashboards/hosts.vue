@@ -7,11 +7,15 @@
           <!-- <span v-if="tab.name === 'charts'">charts</span> -->
           <component v-bind:is="'dashboard-menu-tabs-panel-'+tab.name" :options="panels[tab.name]">
 
-            <template v-if="tab.name === 'settings'" v-slot:performance="{ option }">
-              {{option}}
-
-              <!-- <component v-bind:is="'dashboard-menu-tabs-panel-'+tab.name+'-'+setting">
-              </component> -->
+            <template v-if="tab.name === 'settings'" v-slot:performance="{ option, setting }">
+              <!-- {{option}} -->
+              <!-- v-for="(data, prop) in option" :key="setting+'.'+prop"  -->
+              <component
+                v-bind:is="'dashboard-menu-tabs-panel-'+tab.name+'-performance-'+setting"
+                v-bind="option"
+                @input="handleInput"
+                >
+              </component>
 
             </template>
 
@@ -47,9 +51,9 @@
 
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-ui:pages:dashboard:default')
-// const debug_internals = Debug('mngr-ui:pages:dashboard:default:Internals')
-// const debug_events = Debug('mngr-ui:pages:dashboard:default:Events')
+const debug = Debug('mngr-ui:pages:dashboard:hosts')
+// const debug_internals = Debug('mngr-ui:pages:dashboard:hosts:Internals')
+// const debug_events = Debug('mngr-ui:pages:dashboard:hosts:Events')
 
 // import dashboardMixinDygraph from '@mixins/dashboard.dygraph'
 import dashboardMixin from '@mixins/dashboard'
@@ -57,13 +61,16 @@ import dashboardMixin from '@mixins/dashboard'
 import dashboardMenuTabsPanelCharts from '@components/dashboard/menu.tabs.panel.charts.vue'
 import dashboardMenuTabsPanelSettings from '@components/dashboard/menu.tabs.panel.settings.vue'
 
+import dashboardMenuTabsPanelSettingsPerformanceDygraph from '@components/dashboard/settings/performance.dygraph.vue'
+
 export default {
 
   mixins: [dashboardMixin],
 
   components: {
     dashboardMenuTabsPanelCharts,
-    dashboardMenuTabsPanelSettings
+    dashboardMenuTabsPanelSettings,
+    dashboardMenuTabsPanelSettingsPerformanceDygraph
   },
 
   data () {
@@ -75,22 +82,53 @@ export default {
       ],
       panels: {
         'charts': {},
-        'settings': { performance: ['dygraph'] }
+        'settings': {
+          performance: {
+            'dygraph': { smoothness: false }
+          }
+        }
 
       }
+    }
+  },
+  watch: {
+    'panels.settings.performance.dygraph.smoothness': function (newValue) {
+      Array.each(this.$children, function (child) { // q-page content
+        debug('panels.settings.performance.dygraph.smoothness page', child)
+        Array.each(child.$children, function (content_child) { // q-drawer || child dashboard(s)
+          debug('panels.settings.performance.dygraph.smoothness content', content_child)
+          if (content_child.dygraph_smoothness !== undefined && content_child.id) {
+            this.$store.commit('dashboard_' + content_child.id + '/options_dygraph_smooth', newValue)
+          }
+        }.bind(this))
+      }.bind(this))
+
+      debug('panels.settings.performance.dygraph.smoothness', newValue)
+      this.$store.commit('dashboard_' + this.id + '/options_dygraph_smooth', newValue)
     }
   },
   created: function () {
     this.id = this.id
   },
-  preFetch ({ store, currentRoute, previousRoute, redirect, ssrContext }) {
-    if (process.env.DEV) { debug('preFetch %o', currentRoute) }
+  mounted: function () {
+    debug('created smoothness', this.dygraph_smoothness)
 
-    debug('preFetch %o', currentRoute)
-    // store.registerModule('foo', fooStoreModule)
-    // return store.dispatch('foo/inc')
-    // if (currentRoute.params.id) { this.id = currentRoute.params.id }
+    this.$set(this.panels.settings.performance.dygraph, 'smoothness', this.dygraph_smoothness)
+  },
+  methods: {
+    handleInput: function (payload) {
+      this.$set(this.panels, 'settings', Object.merge(this.panels.settings, payload))
+      debug('handleInput', payload)
+    }
   }
+  // preFetch ({ store, currentRoute, previousRoute, redirect, ssrContext }) {
+  //   if (process.env.DEV) { debug('preFetch %o', currentRoute) }
+  //
+  //   debug('preFetch %o', currentRoute)
+  //   // store.registerModule('foo', fooStoreModule)
+  //   // return store.dispatch('foo/inc')
+  //   // if (currentRoute.params.id) { this.id = currentRoute.params.id }
+  // }
 
   // mounted () {
   //   debug(process.env.DEV, process.env.NODE_ENV)

@@ -2,17 +2,17 @@
 <q-list :dark="$store.state.app.theme.current === 'slate'">
   <q-item-label header>Performance</q-item-label>
 
-  <q-item tag="label" v-ripple>
+  <!-- <q-item tag="label" v-ripple>
   <q-item-section>
   <q-item-label>Battery too low</q-item-label>
   </q-item-section>
   <q-item-section side >
   <q-toggle color="positive" v-model="notif1" val="battery" />
   </q-item-section>
-  </q-item>
+  </q-item> -->
 
-  <template v-for="option in options.performance">
-    <slot name="performance" v-bind:option="option">
+  <template v-for="(option, name) in options.performance">
+    <slot name="performance" v-bind:option="option" v-bind:setting="name">
     </slot>
   </template>
 
