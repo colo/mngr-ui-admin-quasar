@@ -23,3 +23,15 @@ export const paths = (state, payload) => {
     state.paths.push(payload)
   }
 }
+
+export const options = function (state, options) {
+  state.options = options
+}
+
+export const options_dygraph = function (state, options) {
+  state.options.dygraph = options
+}
+
+export const options_dygraph_smooth = function (state, bool) {
+  state.options.dygraph.smooth = bool
+}

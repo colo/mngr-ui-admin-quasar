@@ -11,7 +11,7 @@
 
 <template>
   <!-- <q-layout view="lHh Lpr lFf"> -->
-  <q-layout view="hHh lpR lFr">
+  <q-layout view="hHh lpR lFr" @scroll="scrollHandler">
 
     <!-- <q-header elevated class="shadow-1"> -->
      <!-- class="bg-primary text-white shadow-1" -->
@@ -144,7 +144,7 @@
 
 // import languages from 'quasar/lang/index.json';
 
-// import { colors } from 'quasar';
+import { debounce } from 'quasar'
 
 // const { lighten, setBrand } = colors;
 
@@ -215,6 +215,14 @@ export default {
   //   }));
   // },
   methods: {
+    /**
+    * on scroll quasar seems to activate window.blur
+    * wich makes @mixins/graph.vue to stop updating charts
+    **/
+    scrollHandler: debounce(function (info) {
+      if (process.env.DEV) debug('scrollHandler', info)
+      window.focus()
+    }, 50)
     // openURL
     // swap_theme() {
     //   this.$store.commit('app/swapTheme');

@@ -22,12 +22,13 @@
 </template>
 
 <script>
+/* global smoothPlotter */
 
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-uicomponents:wrappers:dygraph')
-// debug_internals = Debug('mngr-uicomponents:wrappers:dygraph:Internals'),
-// debug_events = Debug('mngr-uicomponents:wrappers:dygraph:Events')
+const debug = Debug('mngr-ui:components:wrappers:dygraph')
+// debug_internals = Debug('mngr-ui:components:wrappers:dygraph:Internals'),
+// debug_events = Debug('mngr-ui:components:wrappers:dygraph:Events')
 
 import chartMixin from '@mixins/chart.vue'
 
@@ -204,8 +205,7 @@ export default {
         /**
         * should add an option for general smooth plotting (true | false)
         **/
-        // if(this.$options.chart_options.fillGraph !=== true)
-        //   this.$options.chart_options.plotter = smoothPlotter
+        if (this.$options.chart_options.fillGraph !== true && this.chart.smooth === true) { this.$options.chart_options.plotter = smoothPlotter }
 
         this.$options.graph = new Dygraph(
           document.getElementById(this.id), // containing div

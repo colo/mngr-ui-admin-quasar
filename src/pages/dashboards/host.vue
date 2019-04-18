@@ -18,7 +18,7 @@
         @hide="hideCollapsible" -->
       <!-- icon="mail" -->
       <!-- caption="5 unread emails" -->
-        <q-resize-observer :id="name+'-resize-observer'" @resize="(size) => {onResize(size, name)}" :debounce="200"/>
+        <q-resize-observer :id="name+'-resize-observer'" @resize="(size) => {onResize(size, name)}" :debounce="10"/>
         <q-card class="bg-secondary">
           <q-card-section class="q-px-none">
 
@@ -212,7 +212,13 @@ export default {
     mapState({
       // modules_blacklist: state => state.hosts.modules_blacklist,
       // modules_whitelist: state => state.hosts.modules_whitelist,
-
+      smoothness: function (state) {
+        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.dygraph.smooth) {
+          return state['dashboard_' + this.id].options.dygraph.smooth
+        } else {
+          return false
+        }
+      },
       /**
       * @overrides mixins/dashboard
       **/
@@ -533,9 +539,16 @@ export default {
               }
             ))
 
+            /**
+            * set color based on current theme
+            **/
+            this.__set_chart_color(source)
+            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+
             debug(source + ' skip', this.available_charts[source].chart)
 
             this.set_chart_visibility(source, true)
+
             this.$on('tabular_sources', function () {
               debug('on tabular_sources', source, this.$options['tabular_sources'][source])
               this.$set(this.available_charts[source].stat, 'data', [this.$options['tabular_sources'][source].data])
@@ -629,7 +642,14 @@ export default {
               }
             ))
 
+            /**
+            * set color based on current theme
+            **/
+            this.__set_chart_color(source)
+            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+
             this.set_chart_visibility(source, true)
+
             this.$on('stat_sources', function () {
               debug('on stat_sources', source, this.$options['stat_sources'][source])
               this.$set(this.available_charts[source].stat, 'data', [this.$options['stat_sources'][source].data])
@@ -709,6 +729,12 @@ export default {
               interval: this.$options['stat_sources'][source].step - 1
             }
           ))
+
+          /**
+          * set color based on current theme
+          **/
+          this.__set_chart_color(source)
+          this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
 
           this.set_chart_visibility(source, true)
 
@@ -825,7 +851,14 @@ export default {
               }
             ))
 
+            /**
+            * set color based on current theme
+            **/
+            this.__set_chart_color(source)
+            this.$set(this.available_charts[source].chart, 'smooth', this.smoothness)
+
             this.set_chart_visibility(source, true)
+
             this.$on('tabular_sources', function () {
               debug('on tabular_sources os_procs_*_percentage_cpu', source, this.$options['tabular_sources'][source])
               this.$set(this.available_charts[source].stat, 'data', [this.$options['tabular_sources'][source].data])
@@ -952,6 +985,12 @@ export default {
                   // if(this.available_charts[merged_chart_name].stat.sources.length === 1)
                   //   this.available_charts[merged_chart_name].stat.merged = false
                   if (this.available_charts[merged_chart_name].stat.data.length === 1) { this.available_charts[merged_chart_name].stat.merged = false }
+
+                  /**
+                  * set color based on current theme
+                  **/
+                  this.__set_chart_color(merged_chart_name)
+                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.smoothness)
 
                   this.set_chart_visibility(merged_chart_name, true)
 
@@ -1114,6 +1153,12 @@ export default {
                   // if(this.available_charts[merged_chart_name].stat.sources.length === 1)
                   //   this.available_charts[merged_chart_name].stat.merged = false
 
+                  /**
+                  * set color based on current theme
+                  **/
+                  this.__set_chart_color(merged_chart_name)
+                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.smoothness)
+
                   this.set_chart_visibility(merged_chart_name, true)
 
                   delete __networkInterfaces_merged_charts[merged_chart_name]
@@ -1174,7 +1219,7 @@ export default {
           __create_os_mounts(this.$options.tabular_sources)
 
           /**
-          * should we turn it off
+          * should we turn it off??
           **/
           // this.$off('tabular_sources', __tabular_sources_event)
         }
@@ -1196,7 +1241,7 @@ export default {
           __create_freemem(this.$options.stat_sources)
 
           /**
-          * should we turn it off
+          * should we turn it off??
           **/
           this.$off('stat_sources', __stat_sources_event)
         }

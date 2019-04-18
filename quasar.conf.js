@@ -63,11 +63,13 @@ module.exports = function (ctx) {
         'QToggle',
         'QCardSection',
         'QExpansionItem',
-        'QResizeObserver'
+        'QResizeObserver',
+        'QScrollObserver'
       ],
 
       directives: [
-        'Ripple'
+        'Ripple',
+         // 'Scroll'
       ],
 
       // Quasar plugins

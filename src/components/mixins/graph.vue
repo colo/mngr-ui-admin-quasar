@@ -13,6 +13,7 @@
     v-bind="wrapper.opts"
   >
   </component>
+  <!-- v-scroll="scrolled" -->
   <!-- <div v-else :style="chart.style">
      <q-inner-loading :visible="chart_init !== true" class="absolute-center">
        <q-spinner-facebook :size="20" color="indigo"></q-spinner-facebook>
@@ -156,6 +157,14 @@ export default {
     this.$off()
   },
   methods: {
+    // scrolled: function (position) {
+    //   debug('scrolled', this.id, position)
+    //   // when this method is invoked then it means user
+    //   // has scrolled the Page to 'position'
+    //   //
+    //   // 'position' is an Integer designating the current
+    //   // scroll position in pixels.
+    // }, // debounce for 200ms
     reset: function () {
       /// ///////console.log('chart.vue mixing reset', this.id, this.$refs[this.id])
       // this.$refs[this.id].reset()

@@ -24,6 +24,8 @@ const DAY = HOUR * 24
 
 import dashboardMenu from '@components/dashboard/menu.vue'
 
+import dashboardMenuTabs from '@components/dashboard/menu.tabs.vue'
+
 import chart from 'components/chart'
 import chartTabular from 'components/chart.tabular'
 
@@ -32,6 +34,7 @@ import chartEmptyContainer from 'components/chart.empty.container'
 export default {
   components: {
     dashboardMenu,
+    dashboardMenuTabs,
     chart,
     chartTabular,
     chartEmptyContainer
@@ -82,6 +85,24 @@ export default {
   },
 
   watch: {
+    'theme': function (current, old) {
+      /**
+      * set color based on current theme
+      **/
+      Object.each(this.available_charts, function (chart, source) {
+        this.__set_chart_color(source)
+        // this.$set(
+        //   this.available_charts[source].chart,
+        //   'options',
+        //   Object.merge(
+        //     this.available_charts[source].chart.options,
+        //     this.$store.state['dashboard_' + this.id].theme[this.theme].dygraph
+        //   )
+        // )
+
+        // debug('watch theme', source)
+      }.bind(this))
+    },
     'id': function (id, old) {
       // if (process.env.DEV) { if (process.env.DEV) debug('id', id) }
 
@@ -94,6 +115,10 @@ export default {
   computed: Object.merge(
     mapState({
       // events: state => state.dashboard.events.list,
+      theme: function (state) {
+        return state.app.theme.current
+      },
+
       events: function (state) {
         return (this.id && state['dashboard_' + this.id]) ? state['dashboard_' + this.id].events.list : undefined
       },
@@ -831,6 +856,16 @@ export default {
     //   }.bind(this))
     //
     // },
+    __set_chart_color: function (source) {
+      this.$set(
+        this.available_charts[source].chart,
+        'options',
+        Object.merge(
+          this.available_charts[source].chart.options,
+          this.$store.state['dashboard_' + this.id].theme[this.theme].dygraph
+        )
+      )
+    },
     set_range: function (start, end) {
       // ////////console.log('set_range', start.utc().startOf('second').valueOf(), end.utc().startOf('second').valueOf())
       let range = [start.utc().startOf('second').valueOf(), end.utc().startOf('second').valueOf()]
