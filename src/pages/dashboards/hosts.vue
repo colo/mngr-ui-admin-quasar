@@ -27,7 +27,7 @@
     <div class="q-pa-md row">
 
       <!-- <div class="column items-end"> -->
-      <!-- <div class="col text-grey">
+      <div class="col text-grey">
         .col
       </div>
       <div class="col-8 text-grey">
@@ -39,7 +39,7 @@
         class="col-auto gt-sm text-grey"
       >
         asdasd
-      </div> -->
+      </div>
 
     </div>
     <router-view />
@@ -61,6 +61,7 @@ import dashboardMixin from '@mixins/dashboard'
 import dashboardMenuTabsPanelCharts from '@components/dashboard/menu.tabs.panel.charts.vue'
 import dashboardMenuTabsPanelSettings from '@components/dashboard/menu.tabs.panel.settings.vue'
 
+import dashboardMenuTabsPanelSettingsPerformanceGraph from '@components/dashboard/settings/performance.graph.vue'
 import dashboardMenuTabsPanelSettingsPerformanceDygraph from '@components/dashboard/settings/performance.dygraph.vue'
 
 export default {
@@ -70,6 +71,7 @@ export default {
   components: {
     dashboardMenuTabsPanelCharts,
     dashboardMenuTabsPanelSettings,
+    dashboardMenuTabsPanelSettingsPerformanceGraph,
     dashboardMenuTabsPanelSettingsPerformanceDygraph
   },
 
@@ -84,6 +86,7 @@ export default {
         'charts': {},
         'settings': {
           performance: {
+            'graph': { always_update: false },
             'dygraph': { smoothness: false }
           }
         }
@@ -105,6 +108,20 @@ export default {
 
       debug('panels.settings.performance.dygraph.smoothness', newValue)
       this.$store.commit('dashboard_' + this.id + '/options_dygraph_smooth', newValue)
+    },
+    'panels.settings.performance.graph.always_update': function (newValue) {
+      Array.each(this.$children, function (child) { // q-page content
+        debug('panels.settings.performance.graph.always_update page', child)
+        Array.each(child.$children, function (content_child) { // q-drawer || child dashboard(s)
+          debug('panels.settings.performance.graph.always_update content', content_child)
+          if (content_child.graph_always_update !== undefined && content_child.id) {
+            this.$store.commit('dashboard_' + content_child.id + '/options', { graph: { always_update: newValue } })
+          }
+        }.bind(this))
+      }.bind(this))
+
+      debug('panels.settings.performance.graph.always_update content', { graph: { always_update: newValue } })
+      this.$store.commit('dashboard_' + this.id + '/options', { graph: { always_update: newValue } })
     }
   },
   created: function () {
@@ -113,6 +130,7 @@ export default {
   mounted: function () {
     debug('created smoothness', this.dygraph_smoothness)
 
+    this.$set(this.panels.settings.performance.graph, 'always_update', this.graph_always_update)
     this.$set(this.panels.settings.performance.dygraph, 'smoothness', this.dygraph_smoothness)
   },
   methods: {

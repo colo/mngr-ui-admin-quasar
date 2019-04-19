@@ -25,7 +25,7 @@ export const paths = (state, payload) => {
 }
 
 export const options = function (state, options) {
-  state.options = options
+  state.options = Object.merge(state.options, options)
 }
 
 export const options_dygraph = function (state, options) {
@@ -33,5 +33,5 @@ export const options_dygraph = function (state, options) {
 }
 
 export const options_dygraph_smooth = function (state, bool) {
-  state.options.dygraph.smooth = bool
+  state.options.dygraph.smoothness = bool
 }

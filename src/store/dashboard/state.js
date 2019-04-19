@@ -1,8 +1,11 @@
 export default function () {
   return {
     options: {
+      graph: {
+        always_update: false
+      },
       dygraph: {
-        smooth: true
+        smoothness: false
       }
     },
     theme: {

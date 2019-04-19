@@ -16,11 +16,27 @@ import { EventBus } from 'boot/eventbus'
 import '@libs/synchronizer' // modified version
 import Dygraph from 'dygraphs'
 
+import { mapState } from 'vuex'
+
 export default {
   mixins: [dashboardMixin],
 
   __sync: undefined,
   highlighted: false,
+
+  computed: Object.merge(
+    mapState({
+      dygraph_smoothness: function (state) {
+        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.dygraph.smoothness !== undefined) {
+          debug('dygraph_smoothness', state['dashboard_' + this.id].options.dygraph.smoothness)
+          return state['dashboard_' + this.id].options.dygraph.smoothness
+        } else {
+          return false
+        }
+      }
+    })
+
+  ),
 
   methods: {
 

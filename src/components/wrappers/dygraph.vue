@@ -44,15 +44,27 @@ export default {
 
   chart_options: {},
   __unwatch_options: undefined,
-  __unwatch_smoth: undefined,
+  __unwatch_smooth: undefined,
 
   props: {
-    EventBus: {
-      type: [Object],
-      default: () => ({})
+    // EventBus: {
+    //   type: [Object],
+    //   default: () => ({})
+    // }
+    smoothness: {
+      type: [Boolean],
+      default: false
     }
   },
 
+  watch: {
+    'smoothness': function (val, old) {
+      debug('smoothness', this.id, val)
+      // if (val && Object.getLength(val) > 0 && val.options) {
+      this.__chart_destroy()
+      this.__chart_create()
+    }
+  },
   created () {
     let self = this
     if (self.EventBus && typeof (self.EventBus.$on) === 'function') {
@@ -68,7 +80,7 @@ export default {
   //
   //   // if(this.$options.graph === null && this.chart_data && this.chart_data.length > 1){
   //   //
-  //   //   this.__create_chart()
+  //   //   this.__chart_create()
   //   //
   //   // }
   //   // this.__watcher()
@@ -81,7 +93,7 @@ export default {
   //   // else{
   //   //   let unwatch = this.$watch('chart', function(val){
   //   //     if(val && Object.getLength(val) > 0 && val.options){
-  //   //       // this.__create_chart()
+  //   //       // this.__chart_create()
   //   //       this.create()
   //   //       unwatch()
   //   //     }
@@ -93,7 +105,7 @@ export default {
   // //
   // //   // if(this.$options.graph === null && this.chart_data && this.chart_data.length > 1){
   // //   //
-  // //   //   this.__create_chart()
+  // //   //   this.__chart_create()
   // //   //
   // //   // }
   // //   // this.__watcher()
@@ -122,7 +134,7 @@ export default {
     destroy: function () {
       /// /////console.log('dygraph destroy', this.id)
 
-      this.__graph_destroy()
+      this.__chart_destroy()
 
       if (this.$options.__unwatcher) {
         this.$options.__unwatcher()
@@ -134,7 +146,7 @@ export default {
         this.$options.__unwatch_options = undefined
       }
     },
-    __graph_destroy () {
+    __chart_destroy () {
       if (this.$options.graph && typeof this.$options.graph.destroy === 'function') {
         // //////////console.log('destroying ...', this.id)
         this.$options.graph.destroy()
@@ -148,32 +160,32 @@ export default {
 
       if (this.chart && this.chart.options) {
         // this.create()
-        this.__create_chart()
+        this.__chart_create()
       } else {
         let unwatch = this.$watch('chart', function (val) {
           if (val && Object.getLength(val) > 0 && val.options) {
-            this.__graph_destroy()
-            this.__create_chart()
+            this.__chart_destroy()
+            this.__chart_create()
             // this.create()
             unwatch()
           }
         })
       }
 
-      this.$options.__unwatch_smoth = this.$watch('chart.smooth', function (val) {
-        debug('chart.smooth', this.id, val)
-        // if (val && Object.getLength(val) > 0 && val.options) {
-        this.__graph_destroy()
-        this.__create_chart()
-        // this.create()
-        // unwatch()
-        // }
-      }, { deep: true })
+      // this.$options.__unwatch_smooth = this.$watch('chart.smooth', function (val) {
+      //   debug('chart.smooth', this.id, val)
+      //   // if (val && Object.getLength(val) > 0 && val.options) {
+      //   this.__chart_destroy()
+      //   this.__chart_create()
+      //   // this.create()
+      //   // unwatch()
+      //   // }
+      // }, { deep: true })
     },
-    __create_chart () {
+    __chart_create () {
       // let unwatch_options = this.$watch('chart.options', function(val){
       //   // if(val && Object.getLength(val) > 0 && val.options){
-      //   //   this.__create_chart()
+      //   //   this.__chart_create()
       //   //   // this.create()
       //   //   unwatch()
       //   // }
@@ -182,7 +194,7 @@ export default {
       this.$options.chart_options = Object.clone(this.chart.options)
       this.$options.__unwatch_options = this.$watch('chart.options', function (val) {
         // // if(val && Object.getLength(val) > 0 && val.options){
-        // //   this.__create_chart()
+        // //   this.__chart_create()
         // //   // this.create()
         // //   unwatch()
         // // }
@@ -190,9 +202,9 @@ export default {
         this.$options.chart_options = Object.clone(val)
       }, { deep: true })
 
-      // console.log('__create_chart', this.id, this.$options.chart_options)
+      // console.log('__chart_create', this.id, this.$options.chart_options)
 
-      debug('__create_chart', this.id, this.$options.chart_options)
+      debug('__chart_create', this.id, this.$options.chart_options, this.smoothness)
 
       if (this.$options.chart_options.labels && document.getElementById(this.id)) {
         if (this.$options.chart_options.labelsDiv) { this.$options.chart_options.labelsDiv = this.id + '-' + this.$options.chart_options.labelsDiv }
@@ -215,12 +227,12 @@ export default {
         //   data.push(row)
         // })
 
-        // console.log('__create_chart', this.id, this.$options.chart_options)
+        // console.log('__chart_create', this.id, this.$options.chart_options)
 
         /**
         * should add an option for general smooth plotting (true | false)
         **/
-        if (this.$options.chart_options.fillGraph !== true && this.chart.smooth === true) { this.$options.chart_options.plotter = smoothPlotter }
+        if (this.$options.chart_options.fillGraph !== true && this.smoothness === true) { this.$options.chart_options.plotter = smoothPlotter }
 
         this.$options.graph = new Dygraph(
           document.getElementById(this.id), // containing div
@@ -230,7 +242,7 @@ export default {
 
         this.$options.graph.ready(function () {
           // //////////////console.log('chart '+this.id+' ready')
-          debug('__create_chart ready', this.id)
+          debug('__chart_create ready', this.id)
           this.ready = true
           // this.update()
         }.bind(this))

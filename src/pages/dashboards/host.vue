@@ -22,11 +22,22 @@
         <q-card class="bg-secondary">
           <q-card-section class="q-px-none">
 
+            <!--
+            - looks faster applying the change with watch->dygraph_smoothness
+            -  than making the property reactive
+            -->
+            <!-- :wrapper="{
+              type: 'dygraph',
+              props: {
+                smoothness: dygraph_smoothness
+              }
+            }" -->
             <component
               :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
               v-if="charts[name]"
               :dashboard="host"
               :wrapper="chart.wrapper"
+              :always_update="graph_always_update"
               :ref="name"
               :id="name"
               :EventBus="$eventbus"
@@ -205,7 +216,17 @@ export default {
 
   watch: {
     // 'host': function(newVal, oldVal) { this.create_pipelines(this.$store.state.app.paths) },
-    'host': function (newVal, oldVal) { this.create_pipelines(newVal) }
+    'host': function (newVal, oldVal) { this.create_pipelines(newVal) },
+    /**
+    * dunno why 'wrapper.props' is not reacting to changes on dygraph_smoothness,
+    * so watch and perform change here
+    **/
+    'dygraph_smoothness': function (newVal, oldVal) {
+      // debug('watch dygraph_smoothness', newVal)
+      Object.each(this.available_charts, function (chart, name) {
+        this.$set(this.available_charts[name].wrapper.props, 'smoothness', newVal)
+      }.bind(this))
+    }
     // '$store.state.app.paths': function(newVal, oldVal) { this.create_pipelines(newVal) }
   },
   computed: Object.merge(
@@ -486,8 +507,8 @@ export default {
                 init: undefined,
                 stop: undefined,
                 wrapper: {
-                  type: 'dygraph',
-                  props: {}
+                  type: 'dygraph'
+                  // props: {}
                 },
                 stat: {
                   merged: false,
@@ -539,11 +560,12 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
+            this.$set(this.available_charts[source].wrapper, 'props', {})
+            this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
             debug(source + ' skip', this.available_charts[source].chart)
 
-            this.set_chart_visibility(source, true)
+            // this.set_chart_visibility(source, true)
 
             this.$on('tabular_sources', function () {
               debug('on tabular_sources', source, this.$options['tabular_sources'][source])
@@ -594,8 +616,8 @@ export default {
                 stop: undefined,
                 tabular: false, // this is for component, if not set, it's "chart-tabular"
                 wrapper: {
-                  type: 'dygraph',
-                  props: {}
+                  type: 'dygraph'
+                  // props: {}
                 },
                 stat: {
                   merged: false,
@@ -642,9 +664,10 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
+            this.$set(this.available_charts[source].wrapper, 'props', {})
+            this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-            this.set_chart_visibility(source, true)
+            // this.set_chart_visibility(source, true)
 
             this.$on('stat_sources', function () {
               debug('on stat_sources', source, this.$options['stat_sources'][source])
@@ -682,8 +705,8 @@ export default {
               stop: undefined,
               tabular: false, // this is for component, if not set, it's "chart-tabular"
               wrapper: {
-                type: 'dygraph',
-                props: {}
+                type: 'dygraph'
+                // props: {}
               },
               stat: {
                 merged: false,
@@ -730,9 +753,10 @@ export default {
           * set color based on current theme
           **/
           this.__set_chart_color(source)
-          this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
+          this.$set(this.available_charts[source].wrapper, 'props', {})
+          this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-          this.set_chart_visibility(source, true)
+          // this.set_chart_visibility(source, true)
 
           this.$on('stat_sources', function () {
             debug('on stat_sources', source, this.$options['stat_sources'][source])
@@ -784,8 +808,8 @@ export default {
                 init: undefined,
                 stop: undefined,
                 wrapper: {
-                  type: 'dygraph',
-                  props: {}
+                  type: 'dygraph'
+                  // props: {}
                 },
                 stat: {
                   merged: false,
@@ -851,9 +875,10 @@ export default {
             * set color based on current theme
             **/
             this.__set_chart_color(source)
-            this.$set(this.available_charts[source].chart, 'smooth', this.dygraph_smoothness)
+            this.$set(this.available_charts[source].wrapper, 'props', {})
+            this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-            this.set_chart_visibility(source, true)
+            // this.set_chart_visibility(source, true)
 
             this.$on('tabular_sources', function () {
               debug('on tabular_sources os_procs_*_percentage_cpu', source, this.$options['tabular_sources'][source])
@@ -908,8 +933,8 @@ export default {
                     init: undefined,
                     stop: undefined,
                     wrapper: {
-                      type: 'dygraph',
-                      props: {}
+                      type: 'dygraph'
+                      // props: {}
                     },
                     stat: {
                       merged: true,
@@ -986,9 +1011,10 @@ export default {
                   * set color based on current theme
                   **/
                   this.__set_chart_color(merged_chart_name)
-                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.dygraph_smoothness)
+                  this.$set(this.available_charts[merged_chart_name].wrapper, 'props', {})
+                  this.$set(this.available_charts[merged_chart_name].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-                  this.set_chart_visibility(merged_chart_name, true)
+                  // this.set_chart_visibility(merged_chart_name, true)
 
                   // console.log('MERGED MOUNT', _merged_charts[merged_chart_name])
 
@@ -1076,8 +1102,8 @@ export default {
                     init: undefined,
                     stop: undefined,
                     wrapper: {
-                      type: 'dygraph',
-                      props: {}
+                      type: 'dygraph'
+                      // props: {}
                     },
                     stat: {
                       merged: true,
@@ -1153,9 +1179,10 @@ export default {
                   * set color based on current theme
                   **/
                   this.__set_chart_color(merged_chart_name)
-                  this.$set(this.available_charts[merged_chart_name].chart, 'smooth', this.dygraph_smoothness)
+                  this.$set(this.available_charts[merged_chart_name].wrapper, 'props', {})
+                  this.$set(this.available_charts[merged_chart_name].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-                  this.set_chart_visibility(merged_chart_name, true)
+                  // this.set_chart_visibility(merged_chart_name, true)
 
                   delete __networkInterfaces_merged_charts[merged_chart_name]
 

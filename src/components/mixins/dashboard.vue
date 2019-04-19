@@ -114,9 +114,10 @@ export default {
 
   computed: Object.merge(
     mapState({
-      dygraph_smoothness: function (state) {
-        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.dygraph.smooth) {
-          return state['dashboard_' + this.id].options.dygraph.smooth
+      graph_always_update: function (state) {
+        if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.graph.always_update !== undefined) {
+          debug('dygraph_smoothness', state['dashboard_' + this.id].options.graph.always_update)
+          return state['dashboard_' + this.id].options.graph.always_update
         } else {
           return false
         }
@@ -247,7 +248,7 @@ export default {
     __dashboard_module: function (id, old) {
       debug('__dashboard_module', id, old)
 
-      // if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) }
+      if (!process.env.DEV) { if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) } }
 
       if (id && !this.$store.state['dashboard_' + id]) { this.$store.registerModule('dashboard_' + id, Object.clone(dashboardStoreModule)) }
     },

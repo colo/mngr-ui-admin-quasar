@@ -10,7 +10,7 @@
     :chart="chart"
     :chart_data="tabular.data"
     :chart_data_length="stat.length"
-    v-bind="wrapper.opts"
+    v-bind="wrapper.props"
   >
   </component>
   <!-- v-scroll="scrolled" -->
@@ -114,8 +114,12 @@ export default {
       type: [Object],
       default: () => ({
         type: 'dygraph',
-        opts: {}
+        props: {}
       })
+    },
+    always_update: {
+      type: [Boolean],
+      default: () => (false)
     }
     // wrapper_props: {
     //   type: [Object],
@@ -127,6 +131,16 @@ export default {
     // }
   },
 
+  // watch: {
+  //   'wrapper.props': {
+  //     handler: function (newValue) {
+  //       debug('wrapper props', newValue)
+  //     },
+  //     deep: true
+  //   }
+  //
+  // },
+
   data () {
     return {
       tabular: { lastupdate: 0, 'data': [[]] },
@@ -135,6 +149,8 @@ export default {
   },
 
   created () {
+    // debug('wrapper', this.wrapper)
+
     window.addEventListener('blur', function () {
       this.$options.focus = false
     }.bind(this), false)
@@ -270,7 +286,10 @@ export default {
         */
 
       // if(this.$options.visible === true){
+      debug('always_update', this.id, this.always_update)
+
       if (
+        this.always_update === true ||
         (inmediate && inmediate === true) ||
           (
             (this.$options.focus === true && this.$options.visible === true) &&
