@@ -7,20 +7,21 @@
       <q-expansion-item
         :id="name+'-collapsible'"
         :key="name+'-collapsible'"
-        expand-separator
         :label="name"
+        :name="name"
         default-opened
         :header-inset-level="0"
         :content-inset-level="0"
-
       >
+      <!-- expand-separator -->
+
         <!-- @show="showCollapsible"
         @hide="hideCollapsible" -->
       <!-- icon="mail" -->
       <!-- caption="5 unread emails" -->
         <q-resize-observer :id="name+'-resize-observer'" @resize="(size) => {onResize(size, name)}" :debounce="10"/>
-        <q-card class="bg-secondary">
-          <q-card-section class="q-px-none">
+        <!-- <q-card class="bg-secondary">
+          <q-card-section class="q-px-none"> -->
 
             <!--
             - looks faster applying the change with watch->dygraph_smoothness
@@ -32,6 +33,7 @@
                 smoothness: dygraph_smoothness
               }
             }" -->
+            <div :style="chart.chart.style" class="q-mb-lg">
             <component
               :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
               v-if="charts[name]"
@@ -50,9 +52,10 @@
               }"
             >
             </component>
-
-          </q-card-section>
-        </q-card>
+          </div>
+          <q-separator />
+          <!-- </q-card-section>
+        </q-card> -->
       </q-expansion-item>
   </template>
 
@@ -149,7 +152,7 @@ export default {
   charts_stat_blacklist: /^[a-zA-Z0-9_.]+$/i, // prev to eslint, is it right? /^[a-zA-Z0-9_\.]+$/i,
   charts_tabular_blacklist: /colo_os_procs_uid_stats_uids_count|os_procs_cmd_stats_cmds_count|os_procs_stats_pids_count|os_procs_stats_uids_count|os_procs_stats_cmds_count|os_procs_stats_percentage_cpu|os_procs_cmd_stats_percentage_cpu|os_procs_uid_stats_percentage_cpu|os_networkInterfaces_stats_(.*?)_(drop|err|packets)|mounts/i,
 
-  name: 'admin-lte-dashboard-host',
+  name: 'dashboard-host',
 
   // daterangepicker:{
   //   opens: 'right',
@@ -215,6 +218,24 @@ export default {
   },
 
   watch: {
+    available_charts: function (newValue) {
+      let _menu = {
+        host: {
+          label: this.host,
+          icon: 'desktop_windows',
+          route: { name: 'hosts', params: { host: this.host } },
+          menu: {}
+        }
+      }
+      Object.each(newValue, function (charts, source) {
+        _menu.host.menu[source] = {
+          label: source,
+          route: { name: 'host', params: { host: this.host }, hash: '#' + source }
+        }
+      }.bind(this))
+
+      this.$eventbus.$emit('host_menu', _menu)
+    },
     // 'host': function(newVal, oldVal) { this.create_pipelines(this.$store.state.app.paths) },
     'host': function (newVal, oldVal) { this.create_pipelines(newVal) },
     /**
@@ -300,17 +321,37 @@ export default {
   // },
 
   methods: {
+    __process_dashboard_host: function (payloads) {
+      debug('__process_dashboard_host', payloads)
 
-    __clean_create: function (next) {
-      EventBus.$off('host')
-      EventBus.$off('os')
-
-      let _host = this.host // read host to set this.id
-      if (next) { next() }
+      if (payloads && Array.isArray(payloads) && payloads.length > 0) {
+        Array.each(payloads, function (payload) {
+          let _type = (payload.type === 'stat' || payload.type === 'tabular') ? 'data' : payload.type
+          this['__process_dashboard_' + _type].attempt(payload, this)
+        }.bind(this))
+      }
     },
     /**
     * @overrides: mixins/dashboard
     **/
+    __create: function (host, next) { // process one event only ('host')
+      this.$eventbus.$on('host', this.__process_dashboard_host.bind(this))
+
+      let __init = function (next) {
+        this.__init_charts()
+        this.$nextTick(this.fire_pipelines_events())
+
+        if (next) { next() }
+      }.bind(this)
+
+      if (process.env.DEV) debug('__create', Object.getLength(this.$options.pipelines))
+
+      if (Object.getLength(this.$options.pipelines) === 0) {
+        this.create_pipelines(host, __init.pass(next))
+      } else if (next) {
+        __init(next())
+      }
+    },
     __set_source: function (type, payload) {
       payload.key = payload.key.replace(/\./g, '_')
       payload.key = payload.key.replace(/%/g, 'percentage_') // prev to eslint, is it right? /\%/g

@@ -32,6 +32,6 @@ export const options_dygraph = function (state, options) {
   state.options.dygraph = options
 }
 
-export const options_dygraph_smooth = function (state, bool) {
+export const options_dygraph_smoothness = function (state, bool) {
   state.options.dygraph.smoothness = bool
 }

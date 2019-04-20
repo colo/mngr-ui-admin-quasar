@@ -1,7 +1,7 @@
 <template>
   <q-item tag="label" v-ripple>
   <q-item-section>
-  <q-item-label>Always update</q-item-label>
+  <q-item-label>Charts: Always update</q-item-label>
   </q-item-section>
   <q-item-section side >
   <q-toggle color="positive" v-model="OnOff" val="always_update" />

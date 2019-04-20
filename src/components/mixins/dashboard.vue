@@ -116,7 +116,7 @@ export default {
     mapState({
       graph_always_update: function (state) {
         if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].options.graph.always_update !== undefined) {
-          debug('dygraph_smoothness', state['dashboard_' + this.id].options.graph.always_update)
+          debug('graph_always_update', state['dashboard_' + this.id].options.graph.always_update)
           return state['dashboard_' + this.id].options.graph.always_update
         } else {
           return false
@@ -481,7 +481,10 @@ export default {
 
       if (doc && this.host === doc.host && doc.paths && Array.isArray(doc.paths)) {
         // this.$eventbus.$off('paths', this.__process_dashboard_paths)
-        if (this.id) { this.$store.commit('dashboard_' + this.id + '/paths', doc.paths) }
+        let _paths = JSON.parse(JSON.stringify(this.$store.state['dashboard_' + this.id].paths)).combine(doc.paths)
+        if (this.id && _paths.length !== this.$store.state['dashboard_' + this.id].paths.length) {
+          this.$store.commit('dashboard_' + this.id + '/paths', _paths)
+        }
       }
       // let paths = []
       // if(doc.paths && doc.paths !== null)
@@ -530,7 +533,9 @@ export default {
           instances[doc.host + '_' + name] = instance
         })
 
-        if (this.id) { this.$store.commit('dashboard_' + this.id + '/instances', instances) }
+        if (process.env.DEV) debug('__process_dashboard_instances commit', doc, this.host === doc.host, doc.instances, doc.instances !== null)
+
+        if (this.id && Object.getLength(instances) !== Object.getLength(this.$store.state['dashboard_' + this.id].instances)) { this.$store.commit('dashboard_' + this.id + '/instances', instances) }
       }
       // let counter = 0
       // let instances_objects = {}

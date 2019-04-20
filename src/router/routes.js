@@ -17,6 +17,7 @@ const routes = [
 
       {
         path: 'hosts',
+        name: 'hosts',
         component: () => import('pages/dashboards/hosts'),
         meta: {
           breadcrumb: { label: 'Hosts', icon: 'fas fa-tachometer-alt' }
@@ -30,6 +31,7 @@ const routes = [
         children: [
           {
             path: ':host',
+            name: 'host',
             component: () => import('pages/dashboards/host'),
             meta: {
               breadcrumb: { label: 'Host', icon: 'widgets' }
