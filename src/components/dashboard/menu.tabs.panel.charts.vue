@@ -2,6 +2,7 @@
   <q-list :dark="$store.state.app.theme.current === 'slate'" class="bg-secondary q-pa-none q-ma-none">
     <template v-for="(option, name) in options.menu">
       <q-expansion-item
+        v-if="option"
         :key="name"
         group="menu"
         :icon="option.icon"
@@ -24,15 +25,14 @@
                 :dark="$store.state.app.theme.current === 'slate'" class="bg-secondary"
                 :key="sub_name"
                 clickable
-                v-ripple
                 dense
                 :to="{name: sub_option.route.name, params: sub_option.route.params, hash: sub_option.route.hash}"
               >
                 <q-item-section v-if="sub_option.icon" avatar>
-                <q-icon :name="sub_option.icon" />
+                <q-icon :name="sub_option.icon" class="text-grey"/>
                 </q-item-section>
 
-                <q-item-section>{{ sub_option.label || sub_name }}</q-item-section>
+                <q-item-section class="text-grey">{{ sub_option.label || sub_name }}</q-item-section>
 
               </q-item>
                <!-- :active="active" -->

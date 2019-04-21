@@ -249,6 +249,7 @@ export default {
       debug('__dashboard_module', id, old)
 
       if (!process.env.DEV) { if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) } }
+      // if (old && this.$store.state['dashboard_' + old]) { this.$store.unregisterModule('dashboard_' + old) }
 
       if (id && !this.$store.state['dashboard_' + id]) { this.$store.registerModule('dashboard_' + id, Object.clone(dashboardStoreModule)) }
     },
@@ -597,72 +598,72 @@ export default {
 
       if (this.id && this.$store.state['dashboard_' + this.id]) { this.$store.commit('dashboard_' + this.id + '/data_range', [payload.data_range.start, payload.data_range.end]) }
     },
-    __process_dashboard_data: function (payload) {},
+    // __process_dashboard_data: function (payload) {},
     /**
     * @last
     **/
-    // __process_dashboard_data: function (payload) {
-    //   debug('__process_dashboard_data', payload)
-    //   // if(payload.range === true)
-    //   // //console.log('recived doc via Event stats', payload)
-    //
-    //   // let type = (payload.tabular === true) ? 'tabular' : 'stat'
-    //   let { type } = payload
-    //
-    //   let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
-    //   // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
-    //   let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
-    //   let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
-    //
-    //   let counter = 0
-    //   if (payload[type]) {
-    //     if (Object.getLength(payload[type]) > 0) {
-    //       Object.each(payload[type], function (data, path) {
-    //         let new_path
-    //         let new_val
-    //         if (Array.isArray(data)) {
-    //           // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
-    //           // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path)
-    //
-    //           if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
-    //             this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path, value: data })
-    //           }
-    //         } else {
-    //           Object.each(data, function (value, key) {
-    //             if (Array.isArray(value)) {
-    //               // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
-    //               // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key)
-    //
-    //               if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
-    //                 this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key, value: value })
-    //               }
-    //             } else {
-    //               // 3rd level, there is no need for more
-    //               Object.each(value, function (val, sub_key) {
-    //                 // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key + '_' + sub_key)
-    //
-    //                 if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
-    //                   this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val })
-    //                 }
-    //               }.bind(this))
-    //             }
-    //           }.bind(this))
-    //         }
-    //
-    //         if (counter === Object.getLength(payload[type]) - 1) {
-    //           // this.$set(this, init, true)
-    //           this[init] = true
-    //           this.$emit(type + '_sources')
-    //         }
-    //
-    //         counter++
-    //       }.bind(this))
-    //     }
-    //     // else{
-    //     //   this.$set(this, init, true)
-    //     // }
-    //   }
-    // },
+    __process_dashboard_data: function (payload) {
+      debug('__process_dashboard_data', payload)
+      // if(payload.range === true)
+      // //console.log('recived doc via Event stats', payload)
+
+      // let type = (payload.tabular === true) ? 'tabular' : 'stat'
+      let { type } = payload
+
+      let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
+      // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
+      let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
+      let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
+
+      let counter = 0
+      if (payload[type]) {
+        if (Object.getLength(payload[type]) > 0) {
+          Object.each(payload[type], function (data, path) {
+            let new_path
+            let new_val
+            if (Array.isArray(data)) {
+              // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
+              // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path)
+
+              if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
+                this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path, value: data })
+              }
+            } else {
+              Object.each(data, function (value, key) {
+                if (Array.isArray(value)) {
+                  // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
+                  // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key)
+
+                  if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
+                    this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key, value: value })
+                  }
+                } else {
+                  // 3rd level, there is no need for more
+                  Object.each(value, function (val, sub_key) {
+                    // if (process.env.DEV) debug('__process_dashboard_data', payload.key + '_' + path + '_' + key + '_' + sub_key)
+
+                    if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
+                      this.$store.commit('dashboard_' + this.id + '/' + type + '_sources/add', { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val })
+                    }
+                  }.bind(this))
+                }
+              }.bind(this))
+            }
+
+            if (counter === Object.getLength(payload[type]) - 1) {
+              this.$set(this, init, true)
+              // this[init] = true
+              this.$emit(type + '_sources')
+            }
+
+            counter++
+          }.bind(this))
+        }
+        // else{
+        //   this.$set(this, init, true)
+        // }
+      }
+    },
     // __process_dashboard_data: function (payload) {
     //   if (process.env.DEV) debug('__process_dashboard_data', payload)
     //   // if(payload.range === true)
@@ -757,35 +758,35 @@ export default {
 
       // this.update_daterangepicker()
 
-      let __init = function (next) {
-        // this.set_range(moment().subtract(10, 'minute'), moment())
-
-        // if (this.all_init === true) {
-        this.__init_charts()
-        this.$nextTick(this.fire_pipelines_events())
-        // } else {
-        //   let unwatch_all_init = this.$watch('all_init', function (val) {
-        //     if (val === true) {
-        //       if (process.env.DEV) debug('watch all_init', val)
-        //
-        //       unwatch_all_init()
-        //
-        //       this.__init_charts()
-        //       this.$nextTick(this.fire_pipelines_events())
-        //     }
-        //   }, { deep: true })// watcher
-        // }
-
-        if (next) { next() }
-      }.bind(this)
-
-      if (process.env.DEV) debug('__create', Object.getLength(this.$options.pipelines))
-
-      if (Object.getLength(this.$options.pipelines) === 0) {
-        this.create_pipelines(host, __init.pass(next))
-      } else if (next) {
-        __init(next())
-      }
+      // let __init = function (next) {
+      //   // this.set_range(moment().subtract(10, 'minute'), moment())
+      //
+      //   // if (this.all_init === true) {
+      //   this.__init_charts()
+      //   this.$nextTick(this.fire_pipelines_events())
+      //   // } else {
+      //   //   let unwatch_all_init = this.$watch('all_init', function (val) {
+      //   //     if (val === true) {
+      //   //       if (process.env.DEV) debug('watch all_init', val)
+      //   //
+      //   //       unwatch_all_init()
+      //   //
+      //   //       this.__init_charts()
+      //   //       this.$nextTick(this.fire_pipelines_events())
+      //   //     }
+      //   //   }, { deep: true })// watcher
+      //   // }
+      //
+      //   if (next) { next() }
+      // }.bind(this)
+      //
+      // if (process.env.DEV) debug('__create', Object.getLength(this.$options.pipelines))
+      //
+      // if (Object.getLength(this.$options.pipelines) === 0) {
+      //   this.create_pipelines(host, __init.pass(next))
+      // } else if (next) {
+      //   __init(next())
+      // }
     },
     __mount: function (next) {
       this.__dashboard_module(this.id)
@@ -999,27 +1000,30 @@ export default {
   /**
   * @start - lifecycle
   **/
-  // beforeRouteUpdate: function (to, from, next) {
-  //   if (process.env.DEV) debug('life cycle beforeRouteUpdate', to.params.host, from)
-  //   // console.log('life cycle beforeRouteUpdate')
-  //
-  //   // react to route changes...
-  //   // don't forget to call next()
-  //   this.__clean_destroy(
-  //     this.__clean_create.pass(
-  //       this.__create.pass([
-  //         // this.$route.params.host || this.$store.state.hosts.current,
-  //         to.params.host,
-  //         this.__mount.pass(next, this)
-  //       ], this),
-  //       this
-  //     )
-  //   )
-  //
-  //   // next()
-  // },
+  beforeRouteUpdate: function (to, from, next) {
+    if (process.env.DEV) debug('life cycle beforeRouteUpdate', to.params.host, from)
+    //   // console.log('life cycle beforeRouteUpdate')
+    //
+    //   // react to route changes...
+    //   // don't forget to call next()
+    //   this.__clean_destroy(
+    //     this.__clean_create.pass(
+    //       this.__create.pass([
+    //         // this.$route.params.host || this.$store.state.hosts.current,
+    //         to.params.host,
+    //         this.__mount.pass(next, this)
+    //       ], this),
+    //       this
+    //     )
+    //   )
+    //
+    next()
+  },
+  beforeCreate: function () {
+    debug('life cycle beforeCreate')
+  },
   created: function () {
-    debug('life cycle created')
+    debug('life cycle created', this.id)
 
     this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
       if (process.env.DEV) debug('events', newVal)
@@ -1086,7 +1090,7 @@ export default {
       this.__clean_destroy()
     }.bind(this))
 
-    if (process.env.DEV) debug('life cycle created', this.$route.params.host)
+    // if (process.env.DEV) debug('life cycle created', this.$route.params.host)
 
     // this.__clean_create(
     //   this.__create.pass([this.$route.params.host || this.$store.state.hosts.current], this)
@@ -1095,13 +1099,25 @@ export default {
       this.__create.pass([this.id], this)
     )
   },
+  beforeMount: function () {
+    debug('life cycle beforeMount', this.id)
+  },
   mounted: function () {
+    debug('life cycle mounted', this.id)
     this.__mount()
   },
+  beforeUpdate: function () {
+    debug('life cycle beforeUpdate', this.id)
+  },
+  updated: function () {
+    debug('life cycle updated', this.id)
+  },
   beforeDestroy: function () {
+    debug('life cycle beforeDestroy', this.id)
     this.__clean_destroy()
   },
   destroyed: function () {
+    debug('life cycle destroyed')
     this.$off()
   }
   // mounted: function () {

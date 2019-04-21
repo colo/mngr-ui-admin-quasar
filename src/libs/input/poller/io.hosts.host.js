@@ -8,9 +8,9 @@ const App = require('node-app-socket.io-client/index')
 // import { throttle } from 'quasar'
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-ui:libs:input:io.host')
-  // debug_internals = Debug('mngr-ui:libs:input:io.host:Internals'),
-  // debug_events = Debug('mngr-ui:libs:input:io.host:Events')
+const debug = Debug('mngr-ui:libs:input:io.hosts.host')
+  // debug_internals = Debug('mngr-ui:libs:input:io.hosts.host:Internals'),
+  // debug_events = Debug('mngr-ui:libs:input:io.hosts.host:Events')
 
 import HostsIO from '@etc/hosts.io'
 
@@ -318,7 +318,7 @@ export default new Class({
 
   // charts: function(socket, next){
   //   let {host, status, charts} = arguments[2]
-  //   console.log('IO.HOST charts', host, status, charts)
+  //   console.log('io.hosts.host charts', host, status, charts)
   //   this.status = status
   //
   //   this.fireEvent('onDoc', [Object.merge({type: 'charts'}, arguments[2]), {type: 'doc', input_type: this, app: null}]);
@@ -363,7 +363,7 @@ export default new Class({
     // }
 
     // if(stats.type == 'range')
-    //   console.log('IO.HOST stats', arguments[2])
+    //   console.log('io.hosts.host stats', arguments[2])
 
     // if(tabular != true)
     this.fireEvent((doc.range) ? 'onRangeDoc' : 'onPeriodicalDoc', [
@@ -396,27 +396,17 @@ export default new Class({
     debug('initialize socket.onConnect', this.io.id)
 
     this.io.emit('on', [
-      {host: this.options.stat_host, prop: 'data_range'},
-      { host: this.options.stat_host, prop: 'instances' },
-      { host: this.options.stat_host, prop: 'paths', format: 'stat' },
+      // {host: this.options.stat_host, prop: 'data_range'},
+      // { host: this.options.stat_host, prop: 'instances' },
+      // { host: this.options.stat_host, prop: 'paths', format: 'stat' },
       { host: this.options.stat_host, prop: 'data', format: 'stat' },
       { host: this.options.stat_host, prop: 'data', format: 'tabular' }
     ])
-    this.io.emit('/', { host: this.options.stat_host, prop: 'instances' })
 
-    // // this.io.emit('on', {host: this.options.stat_host, prop: 'paths', format: 'stat'})
-    //
-    this.io.emit('/', { host: this.options.stat_host, prop: 'data_range' })
-    //
-    this.io.emit('/', { host: this.options.stat_host, prop: 'paths', format: 'stat' })
-    //
-    // // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'stat'})
-    // this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'stat' })
-    //
-    // // this.io.emit('on', {host: this.options.stat_host, prop: 'data', format: 'tabular'})
-    // this.io.emit('/', { host: this.options.stat_host, prop: 'data', format: 'tabular' })
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'instances' })
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'data_range' })
+    // this.io.emit('/', { host: this.options.stat_host, prop: 'paths', format: 'stat' })
 
-    // })
 
     this.addEvent('onExit', function () {
       debug('onExit')

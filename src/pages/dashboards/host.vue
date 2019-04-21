@@ -237,7 +237,9 @@ export default {
       this.$eventbus.$emit('host_menu', _menu)
     },
     // 'host': function(newVal, oldVal) { this.create_pipelines(this.$store.state.app.paths) },
-    'host': function (newVal, oldVal) { this.create_pipelines(newVal) },
+
+    // 'host': function (newVal, oldVal) { this.create_pipelines(newVal) },
+
     /**
     * dunno why 'wrapper.props' is not reacting to changes on dygraph_smoothness,
     * so watch and perform change here
@@ -311,6 +313,13 @@ export default {
     // }
 
   ),
+
+  beforeDestroy: function () {
+    debug('life cycle beforeDestroy', this.id)
+    // this.$eventbus.$off('host', this.__process_dashboard_host.bind(this))
+    this.$eventbus.$off('host')
+  },
+
   // created: function () {
   //   this.id = this.id
   // },
@@ -318,6 +327,12 @@ export default {
   // updated: function(){
   //   debug('updated', this.$route.params.host)
   //   this.$store.commit('hosts/current', this.$route.params.host || '')
+  // },
+  // mounted: function () {
+  //   debug('mounted', this.$route.params.host)
+  //   this.__clean_destroy(
+  //     this.__clean_create.pass(this.__create.pass([this.$route.params.host, this.__mount], this), this)
+  //   )
   // },
 
   methods: {
@@ -1307,7 +1322,7 @@ export default {
           /**
           * should we turn it off??
           **/
-          this.$off('stat_sources', __stat_sources_event)
+          // this.$off('stat_sources', __stat_sources_event)
         }
       }.bind(this)
 
@@ -1323,7 +1338,7 @@ export default {
       /// ///////////////////////console.log('$store.state create_hosts_pipelines', this.$route.params.host, paths)
       host = host || this.$route.params.host || this.$store.state.hosts.current
 
-      this.destroy_pipelines(host)
+      // this.destroy_pipelines(host)
 
       if (host) {
         // this.destroy_pipelines(host)
@@ -1420,6 +1435,7 @@ export default {
       // this.$store.commit('host_'+host+'/clear')
 
       // }
+      debug('destroy_pipelines', this.$options.pipelines)
     }
     /**
     * @end pipelines

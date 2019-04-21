@@ -7,11 +7,11 @@ const App = require ( 'node-app-socket.io-client/index' )
 
 import * as Debug from "debug"
 
-const debug = Debug("mngr-ui:libs:input:io.hosts"),
-      debug_internals = Debug("mngr-ui:libs:input:io.hosts:Internals"),
-      debug_events = Debug("mngr-ui:libs:input:io.hosts:Events");
+const debug = Debug("mngr-ui:libs:input:io.hosts")
+// debug_internals = Debug("mngr-ui:libs:input:io.hosts:Internals"),
+// debug_events = Debug("mngr-ui:libs:input:io.hosts:Events");
 
-import store from 'src/store'
+// import store from 'src/store'
 
 // import DefaultConn from '@etc/default.io'
 import HostsIO from '@etc/hosts.io'
@@ -75,15 +75,17 @@ export default new Class({
 
   },
   register: function(socket, next, result){
-    debug_internals('register %o', result)
+    debug('register %o', result)
 
   },
   hosts: function(socket, next, doc){
-    debug_internals('hosts %o', doc)
+    debug('hosts %o', doc)
     let {type} = doc
 
-    store.commit('hosts/clear')
-    store.commit('hosts/set', doc[type])
+    this.fireEvent('onDoc', [doc, { type: type, input_type: this, app: null }])
+
+    // store.commit('hosts/clear')
+    // store.commit('hosts/set', doc[type])
   },
   // app_doc: function(socket, next){
   //   if(this.recived.length < this.types.length){
@@ -114,7 +116,7 @@ export default new Class({
 	// },
 
   initialize: function(options){
-    debug_internals('initialize')
+    debug('initialize')
 
 		this.parent(options);//override default options
 
@@ -125,17 +127,21 @@ export default new Class({
 
 
     this.addEvent('onConnect', function(){
-      debug_internals('initialize socket.onConnect', this.io.id)
+      debug('initialize socket.onConnect', this.io.id)
       this.io.emit('on', 'hosts')
       this.io.emit('/')
 
     })
 
     this.addEvent('onExit', function(){
-      debug_internals('onExit')
+      debug('onExit')
 
-      if(this.io.disconnected == false)
-        this.io.close()
+      this.io.on('off', 'hosts')
+
+      this.remove_io_routes()
+
+      // if(this.io.disconnected == false)
+      //   this.io.close()
     })
 
 		this.profile('root_init');//end profiling

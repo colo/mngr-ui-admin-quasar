@@ -527,24 +527,14 @@ export default {
       //
       // this.$set(this, 'stat_data', __stat_data)
 
-      if (Array.isArray(data)) {
-        // this.$set(this, 'stat_data', this.$options.stat_data.append(data))
-        Array.each(Array.clone(data), function (val) {
-          let found = false
-          Array.each(this.$options.stat_data, function (stat) {
-            if (stat.timestamp === val.timestamp) { found = true }
-          })
+      if (this.$options.__range_init === false) {
+        // this.$options.__buffer_data.push(JSON.parse(JSON.stringify(data)))
+        this.$options.__buffer_data = this.$options.__buffer_data.append(JSON.parse(JSON.stringify(data)))
 
-          if (found === false) { this.$options.stat_data.push(val) }
-        }.bind(this))
-        this.$options.__range_init = true
-
-        // this.$store.commit('dashboard/events/remove', {
-        //   id: this.id,
-        //   type: 'onRange'
-        // })
-      } else if (this.$options.__range_init === true) {
-        this.$options.__buffer_data.push(JSON.parse(JSON.stringify(data)))
+        if (this.$options.__buffer_data.length > 10) { this.$options.__range_init = true }
+      } else {
+        // this.$options.__buffer_data.push(JSON.parse(JSON.stringify(data)))
+        this.$options.__buffer_data = this.$options.__buffer_data.append(JSON.parse(JSON.stringify(data)))
 
         Array.each(Array.clone(this.$options.__buffer_data), function (val) {
           let found = false
@@ -555,33 +545,33 @@ export default {
           if (found === false) { this.$options.stat_data.push(val) }
         }.bind(this))
 
-        // Array.each(this.$options.__buffer_data, function(buffer_stat){
-        //   let found = false
-        //   Array.each(this.$options.stat_data, function(stat){
-        //     if(stat.timestamp === buffer_stat.timestamp)
-        //       found = true
-        //
-        //   }.bind(this))
-        //
-        //   if(found === false)
-        //     this.$options.stat_data.push( buffer_stat )
-        // }.bind(this))
-
         this.$options.__buffer_data = []
-
-        // let found = false
-        // Array.each(this.$options.stat_data, function(stat){
-        //   if(stat.timestamp === data.timestamp)
-        //     found = true
-        // }.bind(this))
-        //
-        // if(found === false)
-        //   this.$options.stat_data.push( data )
-
-        // added = true
-      } else if (this.$options.__range_init === false) {
-        this.$options.__buffer_data.push(JSON.parse(JSON.stringify(data)))
       }
+
+      // if (Array.isArray(data) && this.$options.__range_init === false) {
+      //   // this.$set(this, 'stat_data', this.$options.stat_data.append(data))
+      //   Array.each(Array.clone(data), function (val) {
+      //     let found = false
+      //     Array.each(this.$options.stat_data, function (stat) {
+      //       if (stat.timestamp === val.timestamp) { found = true }
+      //     })
+      //
+      //     if (found === false) { this.$options.stat_data.push(val) }
+      //   }.bind(this))
+      //
+      //   /**
+      //   * avoid putting data on graph until range data arrives
+      //   **/
+      //   if (data.length > 1) { this.$options.__range_init = true }
+      //
+      //   // this.$store.commit('dashboard/events/remove', {
+      //   //   id: this.id,
+      //   //   type: 'onRange'
+      //   // })
+      // }
+
+      // if (this.$options.__buffer_data.length > 10) { this.$options.__range_init = true }
+      debug('__set_stat_data', this.id, data, this.$options.stat_data, this.$options.__buffer_data.length, this.$options.__range_init)
 
       if (this.$options.__range_init === true) {
         this.$options.stat_data.sort(function (a, b) {

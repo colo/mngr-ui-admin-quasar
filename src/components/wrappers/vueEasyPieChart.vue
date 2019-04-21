@@ -1,11 +1,11 @@
 <template>
 
   <div
-    v-observe-visibility="visibilityChanged"
     :id="id+'-container'"
     :style="chart.style"
     :class="chart.class"
   >
+  <!-- v-observe-visibility="visibilityChanged" -->
     <vue-easy-pie-chart
       v-bind="chart.options"
       :percent="percentage"
@@ -19,6 +19,9 @@
 <script>
 
 // import { frameDebounce } from 'quasar'
+import * as Debug from 'debug'
+
+const debug = Debug('mngr-ui:components:wrappers:easyPieChart')
 
 import VueEasyPieChart from 'vue-easy-pie-chart'
 import 'vue-easy-pie-chart/dist/vue-easy-pie-chart.css'
@@ -84,6 +87,7 @@ export default {
   },
 
   created () {
+    debug('created', this.id)
     // this.chart = this
     // window.addEventListener('blur', function() {
     //    this.focus = false

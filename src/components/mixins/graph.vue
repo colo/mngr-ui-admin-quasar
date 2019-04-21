@@ -149,7 +149,7 @@ export default {
   },
 
   created () {
-    // debug('wrapper', this.wrapper)
+    debug('created', this.id, this.wrapper, this.chart, this.chart_data)
 
     window.addEventListener('blur', function () {
       this.$options.focus = false
