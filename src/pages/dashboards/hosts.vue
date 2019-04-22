@@ -36,78 +36,66 @@
       <!-- <div class="col-8 text-grey">
         qqewqwe
       </div> -->
+        <div class="col-auto text-grey">
 
-      <template v-if="!$route.params.host">
         <div
-          class="col-4 gt-sm text-grey"
+          class="q-pa-md row"
           v-for="host in $store.state['hosts'].all"
           :key="host"
         >
-          {{host}}
+        <!-- :class="(!$route.params.host) ? 'col-4 gt-sm text-grey' : 'col-auto gt-sm text-grey'" -->
           <template v-for="(chart, name) in hosts_charts[host]">
-            <div :key="host+'-'+name" class="q-mb-lg" style="height: 100px">
-              {{host}} {{name}}
-              <!-- :style="chart.chart.style"  -->
-              <component
-                :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
-                dashboard="hosts"
-                :wrapper="chart.wrapper"
-                :ref="name"
-                :id="name"
-                :EventBus="$eventbus"
-                :chart="chart.chart"
-                :stat="{
-                  range: chart.stat.range,
-                  length: chart.stat.length,
-                  merged: chart.stat.merged,
-                  data: chart.stat.data
-                }"
-              >
-              <!-- :stat="{
-                range: range,
-                length: chart.stat.length,
-                merged: chart.stat.merged,
-                data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
-              }" -->
-              <!-- :always_update="graph_always_update" -->
-              </component>
-            </div>
-          </template>
 
-        </div>
-      </template>
-      <template v-else>
-        <div
-          class="col-auto gt-sm text-grey"
-        >
-          <template v-for="(chart, name) in hosts_charts[host]">
-            <div :key="name" class="q-mb-lg" >
-              <!-- :style="chart.chart.style" -->
-              <component
-                :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
-                :dashboard="host"
-                :wrapper="chart.wrapper"
-                :always_update="graph_always_update"
-                :ref="name"
-                :id="name"
-                :EventBus="$eventbus"
-                :chart="chart.chart"
-                :stat="{
+            <div
+            :key="host+'-'+name"
+            v-if="!$route.params.host || host === $route.params.host"
+            class="col gt-sm text-grey q-mb-lg"
+            >
+            <!-- class="q-mb-lg" -->
+              <!-- {{host}} {{name}} -->
+              <!-- :style="chart.chart.style"  -->
+              <!-- <transition-group name="sumarry-component"> -->
+                <!-- <keep-alive> -->
+                <component
+                  :key="host+'-'+name+'component'"
+                  :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
+                  dashboard="hosts"
+                  :wrapper="chart.wrapper"
+                  :ref="host+'-'+name"
+                  :id="host+'-'+name"
+                  :EventBus="$eventbus"
+                  :chart="chart.chart"
+                  :stat="{
+                    range: chart.stat.range,
+                    length: chart.stat.length,
+                    merged: chart.stat.merged,
+                    data: chart.stat.data
+                  }"
+                >
+                <!-- :stat="{
                   range: range,
                   length: chart.stat.length,
                   merged: chart.stat.merged,
                   data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
-                }"
-              >
-              </component>
-            </div>
-          </template>
-          current
-        </div>
-      </template>
+                }" -->
+                <!-- :always_update="graph_always_update" -->
+                </component>
+                <!-- </keep-alive> -->
+              <!-- </transition-group > -->
 
+            </div>
+
+          </template>
+
+        </div>
+
+        </div>
+        <!-- https://stackoverflow.com/questions/40404787/best-practice-for-reacting-to-params-changes-with-vue-router -->
+
+        <transition name="view" mode="out-in" appear>
+          <router-view :key="$route.params.host"/>
+        </transition>
     </div>
-    <router-view />
 
   </q-page>
 </template>
@@ -275,9 +263,10 @@ export default {
 
             template.input[0].poll.conn[0].stat_host = host
 
-            let pipeline_id = template.input[0].poll.id
             template.input[0].poll.id += '-' + host
             template.input[0].poll.conn[0].id = template.input[0].poll.id
+            let pipeline_id = template.input[0].poll.id
+
             // template.input[0].poll.conn[0].id = template.input[0].poll.suspended = true
 
             if (!this.$options.pipelines[pipeline_id]) {
@@ -549,28 +538,172 @@ export default {
       //   }.bind(this))
       // }.bind(this)
       //
+      let __create_cpus_percentage = function (tabular_sources) {
+        let re = /_os_cpus_percentage$/
+
+        Object.each(tabular_sources, function (data, source) {
+          if (re.test(source)) {
+            debug('PRE __create_cpus_percentage', source, this.$options['tabular_sources'][source])
+
+            let host = source.substring(0, source.indexOf('_'))
+            let name = source + '_pie'
+            if (
+              !this.available_charts[name]
+            ) {
+              debug('__create_cpus_percentage', name, this.$options['tabular_sources'][source])
+
+              this.$set(this.available_charts, name, Object.merge(
+                Object.clone({
+                  name: name,
+                  chart: undefined,
+                  init: undefined,
+                  stop: undefined,
+                  tabular: true, // this is for component, if not set, it's "chart-tabular"
+                  wrapper: {
+                    type: 'vue-easy-pie-chart',
+                    props: {
+                      decimals: 2,
+                      options: {
+                        // 'track-color': true,
+                        // size: 80,
+                        // animated: false,
+                        'font-size': '14px',
+                        'bar-color': function (percentage) {
+                          if (percentage > 0 && percentage < 33) {
+                            return '#86b300'
+                          } else if (percentage > 33 && percentage < 66) {
+                            return '#f6d95b'
+                          } else {
+                            return '#ff704d'
+                          }
+                        }
+                      }
+                    }
+                  },
+                  stat: {
+                    merged: false,
+                    // sources: [{type: 'stat', path: source}],
+                    data: [this.$options['tabular_sources'][source].data],
+                    // events: [{
+                    //   host: this.host,
+                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   // key: 'cpus',
+                    //   // length: this.seconds,
+                    //   tabular: false
+                    //   // range: this.range
+                    // }],
+                    length: 2,
+                    range: 2
+                  }
+                  /**
+                    * for __get_stat_for_chart
+                    **/
+                  // pipeline: {
+                  //   name: 'input.os'
+                  //   // // path: 'os',
+                  //   // range: true
+                  // }
+                })
+                // chart_payload,
+                // {
+                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                // }
+              ))
+
+              this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
+
+              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+
+              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+
+              /**
+              * set color based on current theme
+              **/
+              // this.__set_chart_color(source)
+              // this.$set(this.available_charts[source].wrapper, 'props', {})
+              // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
+
+              this.set_chart_visibility(name, true)
+
+              this.$on('tabular_sources', function () {
+                let re = /_os_cpus_percentage$/
+                Object.each(this.$options['tabular_sources'], function (data, source) {
+                  if (re.test(source)) {
+                    let host = source.substring(0, source.indexOf('_'))
+                    let name = source + '_pie'
+                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
+
+                    // if(this.$options['stat_sources'][source] !== undefined){
+                    this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
+
+                    this.$set(
+                      this.available_charts[name].chart,
+                      'skip',
+                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
+                    )
+
+                    this.$set(
+                      this.available_charts[name].chart,
+                      'interval',
+                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
+                    )
+                  }
+                }.bind(this))
+
+                // }
+              }.bind(this))
+            }
+            debug('cpus_percentage pie', this.hosts_charts[host])
+          }
+        }.bind(this))
+
+        // let source = this.host + '_os_freemem'
+        // let chart_payload = this.$options.charts_payloads['os_freemem']
+      }.bind(this)
+
       let __create_freemem = function (stat_sources) {
         let re = /_os_freemem$/
 
-        // debug('__create_freemem', this.$options.charts_payloads['os_freemem'])
         Object.each(stat_sources, function (data, source) {
           if (re.test(source)) {
-            let host = source.substring(0, source.indexOf('_'))
+            debug('PRE __create_freemem', source, this.$options['stat_sources'][source])
 
+            let host = source.substring(0, source.indexOf('_'))
+            let name = source + '_pie'
             if (
-              !this.available_charts[source] &&
+              !this.available_charts[name] &&
               stat_sources[host + '_os_totalmem']
             ) {
-              this.$set(this.available_charts, source, Object.merge(
+              debug('__create_freemem', name, this.$options['stat_sources'][source])
+
+              this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
-                  name: source,
+                  name: name,
                   chart: undefined,
                   init: undefined,
                   stop: undefined,
                   tabular: false, // this is for component, if not set, it's "chart-tabular"
                   wrapper: {
-                    type: 'vue-easy-pie-chart'
-                    // props: {}
+                    type: 'vue-easy-pie-chart',
+                    props: {
+                      decimals: 2,
+                      options: {
+                        // 'track-color': true,
+                        size: 90,
+                        // animated: false,
+                        'font-size': '14px',
+                        'bar-color': function (percentage) {
+                          if (percentage > 0 && percentage < 33) {
+                            return '#ff704d'
+                          } else if (percentage > 33 && percentage < 66) {
+                            return '#f6d95b'
+                          } else {
+                            return '#86b300'
+                          }
+                        }
+                      }
+                    }
                   },
                   stat: {
                     merged: false,
@@ -603,40 +736,42 @@ export default {
                 // }
               ))
 
-              this.$set(this.available_charts[source], 'chart', Object.merge(Object.clone(pie_chart), {
+              this.$set(this.available_charts[name], 'chart', Object.merge(Object.clone(pie_chart), {
                 totalmem: this.$options.stat_sources[host + '_os_totalmem'].data[0].value,
                 watch: {
                   /**
                   * @trasnform: diff between each value against its prev one
                   */
                   transform: function (values, caller, chart) {
-                    debug('freemem transform', values)
-                    let last = values[values.length - 1]
-                    last.value = last.value * 100 / chart.totalmem
-                    // //////////////console.log('_os_freemem_pie transform', values, chart.totalmem, last)
-                    return values
-                  }
-                },
-                options: {
-                  // 'track-color': false,
-                  size: 80,
-                  // animated: false,
-                  'font-size': '14px',
-                  'bar-color': function (percentage) {
-                    if (percentage > 0 && percentage < 33) {
-                      return '#ff704d'
-                    } else if (percentage > 33 && percentage < 66) {
-                      return '#f6d95b'
-                    } else {
-                      return '#86b300'
-                    }
+                    debug('freemem transform', values, chart.totalmem)
+                    let last = Object.clone(values[values.length - 1])
+                    last.value = ((last.value) * 100) / chart.totalmem
+
+                    debug('freemem transformed', last)
+                    return [last]
+                    // return values
                   }
                 }
+                // options: {
+                //   // 'track-color': false,
+                //   size: 80,
+                //   // animated: false,
+                //   'font-size': '14px',
+                //   'bar-color': function (percentage) {
+                //     if (percentage > 0 && percentage < 33) {
+                //       return '#ff704d'
+                //     } else if (percentage > 33 && percentage < 66) {
+                //       return '#f6d95b'
+                //     } else {
+                //       return '#86b300'
+                //     }
+                //   }
+                // }
               }))
 
               if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
 
-              this.$set(this.hosts_charts[host], source, this.available_charts[source])
+              this.$set(this.hosts_charts[host], name, this.available_charts[name])
 
               /**
               * set color based on current theme
@@ -645,27 +780,29 @@ export default {
               // this.$set(this.available_charts[source].wrapper, 'props', {})
               // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-              this.set_chart_visibility(source, true)
+              this.set_chart_visibility(name, true)
 
               this.$on('stat_sources', function () {
+                let re = /_os_freemem$/
                 Object.each(this.$options['stat_sources'], function (data, source) {
                   if (re.test(source)) {
                     let host = source.substring(0, source.indexOf('_'))
-                    debug('on stat_sources', source, this.$options['stat_sources'][source])
+                    let name = source + '_pie'
+                    debug('on stat_sources', name, this.$options['stat_sources'][source])
 
                     // if(this.$options['stat_sources'][source] !== undefined){
-                    this.$set(this.available_charts[source].stat, 'data', [this.$options['stat_sources'][source].data])
+                    this.$set(this.available_charts[name].stat, 'data', [this.$options['stat_sources'][source].data])
 
                     this.$set(
-                      this.available_charts[source].chart,
+                      this.available_charts[name].chart,
                       'skip',
-                      (this.available_charts[source].chart.skip > this.$options['stat_sources'][source].step) ? this.available_charts[source].chart.skip : this.$options['stat_sources'][source].step - 1
+                      (this.available_charts[name].chart.skip > this.$options['stat_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['stat_sources'][source].step - 1
                     )
 
                     this.$set(
-                      this.available_charts[source].chart,
+                      this.available_charts[name].chart,
                       'interval',
-                      (this.available_charts[source].chart.interval > this.$options['stat_sources'][source].step) ? this.available_charts[source].chart.interval : this.$options['stat_sources'][source].step - 1
+                      (this.available_charts[name].chart.interval > this.$options['stat_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['stat_sources'][source].step - 1
                     )
                   }
                 }.bind(this))
@@ -685,16 +822,17 @@ export default {
         debug('$options.tabular_sources', this.$options.tabular_sources, this.$store.state['dashboard_' + this.id].instances, this.$store.state['dashboard_' + this.id].paths.length)
 
         if (
-          this.$options.tabular_sources &&
-          this.dashboard_instances &&
-          this.$store.state['dashboard_' + this.id].paths.length > 0
+          this.$options.tabular_sources
+          // &&
+          // this.dashboard_instances &&
+          // this.$store.state['dashboard_' + this.id].paths.length > 0
         ) {
           debug('$options.tabular_sources TRUE', this.$options.tabular_sources, this.id)
           // __create_from_tabular_sources(this.$options.tabular_sources)
           // __create_os_procs_percentage_cpu(this.$options.tabular_sources)
           // __create_os_networkInterfaces_stats_packets_drop_err(this.$options.tabular_sources)
           // __create_os_mounts(this.$options.tabular_sources)
-
+          __create_cpus_percentage(this.$options.tabular_sources)
           /**
           * should we turn it off??
           **/
