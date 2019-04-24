@@ -54,6 +54,8 @@ import vueEasyPieChartWrapper from 'components/wrappers/vueEasyPieChart'
 // import jqueryKnobWrapper from 'components/wrappers/jqueryKnob'
 import highchartsVueWrapper from 'components/wrappers/highchartsVue'
 
+// import easyPieChartWrapper from 'components/wrappers/easyPieChart'
+
 const roundMilliseconds = function (timestamp) {
   let d = new Date(timestamp)
   d.setMilliseconds(0)
@@ -70,6 +72,7 @@ export default {
     vueEasyPieChartWrapper,
     // jqueryKnobWrapper,
     highchartsVueWrapper
+    // easyPieChartWrapper
   },
 
   tabular: {

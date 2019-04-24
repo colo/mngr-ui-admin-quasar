@@ -1,11 +1,12 @@
 <template>
 
-  <div
+  <!-- <div
     :id="id+'-container'"
     :style="chart.style"
-    :class="chart.class"
-  >
+    class="netdata-container-easypiechart"
+  > -->
   <!-- v-observe-visibility="visibilityChanged" -->
+
     <vue-easy-pie-chart
       :percent="percentage"
       :id="id"
@@ -13,7 +14,7 @@
     />
     <!-- v-bind="chart.options" -->
 
-  </div>
+  <!-- </div> -->
   <!-- v-bind:class="container_class_helper" -->
 </template>
 
@@ -162,3 +163,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+/* #vue-easy-pie-chart {
+  all: initial;
+  * {
+    all: unset;
+  }
+} */
+</style>

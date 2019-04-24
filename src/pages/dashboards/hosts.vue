@@ -27,7 +27,7 @@
       </dashboard-menu-tabs>
     </dashboard-menu>
     <!-- <div class="q-pa-none row justify-end"> -->
-    <div class="q-pa-md row">
+    <!-- <div class="q-pa-md row"> -->
 
       <!-- <div class="column items-end"> -->
       <!-- <div class="col-4 text-grey">
@@ -36,66 +36,84 @@
       <!-- <div class="col-8 text-grey">
         qqewqwe
       </div> -->
-        <div class="col-auto text-grey">
+        <!-- <div class="q-pa-md row text-grey"> -->
 
-        <div
-          class="q-pa-md row"
-          v-for="host in $store.state['hosts'].all"
-          :key="host"
-        >
-        <!-- :class="(!$route.params.host) ? 'col-4 gt-sm text-grey' : 'col-auto gt-sm text-grey'" -->
-          <template v-for="(chart, name) in hosts_charts[host]">
-
-            <div
-            :key="host+'-'+name"
+          <div
+            v-for="host in $store.state['hosts'].all"
+            :key="host"
+            style="width: 100%"
+            class="row"
+          >
+          <!-- :class="(!$route.params.host) ? 'col-4 gt-sm text-grey' : 'col-auto gt-sm text-grey'" -->
+          <q-expansion-item
             v-if="!$route.params.host || host === $route.params.host"
-            class="col gt-sm text-grey q-mb-lg"
-            >
-            <!-- class="q-mb-lg" -->
-              <!-- {{host}} {{name}} -->
-              <!-- :style="chart.chart.style"  -->
-              <!-- <transition-group name="sumarry-component"> -->
-                <!-- <keep-alive> -->
-                <component
-                  :key="host+'-'+name+'component'"
-                  :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
-                  dashboard="hosts"
-                  :wrapper="chart.wrapper"
-                  :ref="host+'-'+name"
-                  :id="host+'-'+name"
-                  :EventBus="$eventbus"
-                  :chart="chart.chart"
-                  :stat="{
-                    range: chart.stat.range,
+            :id="host+'-collapsible'"
+            :key="host+'-collapsible'"
+            :label="host"
+            :name="host"
+            default-opened
+            :header-inset-level="0"
+            :content-inset-level="0"
+          >
+            <!-- <q-card class="text-grey"> -->
+              <template v-for="(chart, name) in hosts_charts[host]">
+                <div :key="host+'-'+name" class="col-auto text-grey">
+              <!-- <q-card class="text-grey"> -->
+                <!-- <q-card-section :key="host+'-'+name"> -->
+
+              <!-- class="col gt-sm text-grey q-mb-lg" -->
+              <!-- class="q-mb-lg" -->
+                <!-- {{host}} {{name}} -->
+                <!-- :style="chart.chart.style"  -->
+                <!-- <transition-group name="sumarry-component"> -->
+                  <!-- <keep-alive> -->
+                  <component
+
+                    :key="host+'-'+name+'component'"
+                    :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
+                    dashboard="hosts"
+                    :wrapper="chart.wrapper"
+                    :ref="host+'-'+name"
+                    :id="host+'-'+name"
+                    :EventBus="$eventbus"
+                    :chart="chart.chart"
+                    :stat="{
+                      range: chart.stat.range,
+                      length: chart.stat.length,
+                      merged: chart.stat.merged,
+                      data: chart.stat.data
+                    }"
+                  >
+                  <!-- :stat="{
+                    range: range,
                     length: chart.stat.length,
                     merged: chart.stat.merged,
-                    data: chart.stat.data
-                  }"
-                >
-                <!-- :stat="{
-                  range: range,
-                  length: chart.stat.length,
-                  merged: chart.stat.merged,
-                  data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
-                }" -->
-                <!-- :always_update="graph_always_update" -->
-                </component>
-                <!-- </keep-alive> -->
-              <!-- </transition-group > -->
+                    data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
+                  }" -->
+                  <!-- :always_update="graph_always_update" -->
+                  </component>
+                  <!-- </keep-alive> -->
+                <!-- </transition-group > -->
 
-            </div>
+                <!-- </q-card-section> -->
+                  </div>
+                </template>
+              <!-- </q-card> -->
 
-          </template>
+            <!-- </div> -->
+            <!-- <q-separator /> -->
 
-        </div>
+          </q-expansion-item>
+          </div>
 
-        </div>
+        <!-- </div> -->
         <!-- https://stackoverflow.com/questions/40404787/best-practice-for-reacting-to-params-changes-with-vue-router -->
 
-        <transition name="view" mode="out-in" appear>
-          <router-view :key="$route.params.host"/>
-        </transition>
-    </div>
+    <!-- </div> -->
+
+    <transition name="view" mode="out-in" appear>
+      <router-view :key="$route.params.host"/>
+    </transition>
 
   </q-page>
 </template>
