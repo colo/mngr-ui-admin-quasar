@@ -27,14 +27,9 @@
       </dashboard-menu-tabs>
     </dashboard-menu>
 
-    <div class="row items-center justify-center" :dark="$store.state.app.theme.current === 'slate'">
+    <div class="row">
       <template v-for="host in $store.state['hosts'].all">
-      <div
-      :key="host"
-      :class="(!$route.params.host) ? 'col-6' : 'col-12'"
-      v-if="!$route.params.host || host === $route.params.host"
-      :dark="$store.state.app.theme.current === 'slate'"
-      >
+      <div :key="host" :class="(!$route.params.host) ? 'col-6' : 'col-12'">
 
         <q-expansion-item
           :id="host+'-collapsible'"
@@ -45,14 +40,13 @@
           :header-inset-level="0"
           :content-inset-level="0"
           style="width: 100%"
-          :dark="$store.state.app.theme.current === 'slate'"
         >
         <div class="row items-center justify-center">
           <template v-for="(chart, name) in hosts_charts[host]">
-            <div :key="host+'-'+name" class="column items-center">
-            <div class="col-4 text-grey q-pa-md">
-
+            <div :key="host+'-'+name" class="col-12 col-md text-grey">
+              <!-- <p>{{host+'-'+name}}</p> -->
               <component
+
                 :key="host+'-'+name+'component'"
                 :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
                 dashboard="hosts"
@@ -76,9 +70,7 @@
               }" -->
               <!-- :always_update="graph_always_update" -->
               </component>
-
             </div>
-            </div> <!-- column -->
         </template>
         </div>
         </q-expansion-item>
@@ -86,6 +78,90 @@
       </div>
       </template>
     </div>
+
+    <!-- <div class="q-pa-none row justify-end"> -->
+    <!-- <div class="q-pa-md row"> -->
+
+      <!-- <div class="column items-end"> -->
+      <!-- <div class="col-4 text-grey">
+        .col
+      </div> -->
+      <!-- <div class="col-8 text-grey">
+        qqewqwe
+      </div> -->
+        <!-- <div class="q-pa-md row text-grey"> -->
+
+          <div
+            v-for="host in $store.state['hosts'].all"
+            :key="host"
+            style="width: 100%"
+            class="row"
+          >
+          <!-- :class="(!$route.params.host) ? 'col-4 gt-sm text-grey' : 'col-auto gt-sm text-grey'" -->
+          <q-expansion-item
+            v-if="!$route.params.host || host === $route.params.host"
+            :id="host+'-collapsible'"
+            :key="host+'-collapsible'"
+            :label="host"
+            :name="host"
+            default-opened
+            :header-inset-level="0"
+            :content-inset-level="0"
+          >
+            <!-- <q-card class="text-grey"> -->
+              <template v-for="(chart, name) in hosts_charts[host]">
+                <div :key="host+'-'+name" class="col-auto text-grey">
+              <!-- <q-card class="text-grey"> -->
+                <!-- <q-card-section :key="host+'-'+name"> -->
+
+              <!-- class="col gt-sm text-grey q-mb-lg" -->
+              <!-- class="q-mb-lg" -->
+                <!-- {{host}} {{name}} -->
+                <!-- :style="chart.chart.style"  -->
+                <!-- <transition-group name="sumarry-component"> -->
+                  <!-- <keep-alive> -->
+                  <component
+
+                    :key="host+'-'+name+'component'"
+                    :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
+                    dashboard="hosts"
+                    :wrapper="chart.wrapper"
+                    :ref="host+'-'+name"
+                    :id="host+'-'+name"
+                    :EventBus="$eventbus"
+                    :chart="chart.chart"
+                    :stat="{
+                      range: chart.stat.range,
+                      length: chart.stat.length,
+                      merged: chart.stat.merged,
+                      data: chart.stat.data
+                    }"
+                  >
+                  <!-- :stat="{
+                    range: range,
+                    length: chart.stat.length,
+                    merged: chart.stat.merged,
+                    data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
+                  }" -->
+                  <!-- :always_update="graph_always_update" -->
+                  </component>
+                  <!-- </keep-alive> -->
+                <!-- </transition-group > -->
+
+                <!-- </q-card-section> -->
+                  </div>
+                </template>
+              <!-- </q-card> -->
+
+            <!-- </div> -->
+            <!-- <q-separator /> -->
+
+          </q-expansion-item>
+          </div>
+
+        <!-- </div> -->
+
+    <!-- </div> -->
 
     <!-- https://stackoverflow.com/questions/40404787/best-practice-for-reacting-to-params-changes-with-vue-router -->
     <transition name="view" mode="out-in" appear>
@@ -543,7 +619,7 @@ export default {
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
-              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
+              !this.available_charts[name]
             ) {
               debug('__create_cpus_percentage', name, this.$options['tabular_sources'][source])
 
@@ -560,7 +636,7 @@ export default {
                       decimals: 2,
                       options: {
                         // 'track-color': true,
-                        size: 90,
+                        // size: 80,
                         // animated: false,
                         'font-size': '14px',
                         'bar-color': function (percentage) {
@@ -619,7 +695,7 @@ export default {
               // this.$set(this.available_charts[source].wrapper, 'props', {})
               // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-              // this.set_chart_visibility(name, true)
+              this.set_chart_visibility(name, true)
 
               this.$on('tabular_sources', function () {
                 let re = /_os_cpus_percentage$/
@@ -657,120 +733,6 @@ export default {
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
-      let __create_os_loadavg = function (tabular_sources) {
-        let re = /_os_loadavg$/
-
-        Object.each(tabular_sources, function (data, source) {
-          if (re.test(source)) {
-            debug('PRE __create_os_loadavg', source, this.$options['tabular_sources'][source])
-
-            let host = source.substring(0, source.indexOf('_'))
-            let name = source + '_odometer'
-            if (
-              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
-            ) {
-              debug('__create_os_loadavg', name, this.$options['tabular_sources'][source])
-
-              this.$set(this.available_charts, name, Object.merge(
-                Object.clone({
-                  name: name,
-                  chart: undefined,
-                  init: undefined,
-                  stop: undefined,
-                  tabular: true, // this is for component, if not set, it's "chart-tabular"
-                  wrapper: {
-                    type: 'vue-odometer',
-                    props: {
-                      // decimals: 2,
-                      options: {
-                        // theme: 'car'
-                        duration: 200
-                      }
-                    }
-                  },
-                  stat: {
-                    merged: false,
-                    // sources: [{type: 'stat', path: source}],
-                    data: [this.$options['tabular_sources'][source].data],
-                    // events: [{
-                    //   host: this.host,
-                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
-                    //   // key: 'cpus',
-                    //   // length: this.seconds,
-                    //   tabular: false
-                    //   // range: this.range
-                    // }],
-                    length: 2,
-                    range: 2
-                  }
-                  /**
-                    * for __get_stat_for_chart
-                    **/
-                  // pipeline: {
-                  //   name: 'input.os'
-                  //   // // path: 'os',
-                  //   // range: true
-                  // }
-                })
-                // chart_payload,
-                // {
-                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
-                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
-                // }
-              ))
-
-              // this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
-              this.$set(this.available_charts[name], 'chart', {})
-
-              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
-
-              this.$set(this.hosts_charts[host], name, this.available_charts[name])
-
-              /**
-              * set color based on current theme
-              **/
-              // this.__set_chart_color(source)
-              // this.$set(this.available_charts[source].wrapper, 'props', {})
-              // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
-
-              // this.set_chart_visibility(name, true)
-
-              this.$on('tabular_sources', function () {
-                let re = /_os_loadavg$/
-                Object.each(this.$options['tabular_sources'], function (data, source) {
-                  if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
-                    let name = source + '_odometer'
-                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
-
-                    // if(this.$options['stat_sources'][source] !== undefined){
-                    this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'skip',
-                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
-                    )
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'interval',
-                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
-                    )
-                  }
-                }.bind(this))
-
-                // }
-              }.bind(this))
-            }
-            debug('os_loadavg odometer', this.hosts_charts[host])
-          }
-        }.bind(this))
-
-        // let source = this.host + '_os_freemem'
-        // let chart_payload = this.$options.charts_payloads['os_freemem']
-      }.bind(this)
-
       let __create_freemem = function (stat_sources) {
         let re = /_os_freemem$/
 
@@ -781,7 +743,7 @@ export default {
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
-              (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
+              !this.available_charts[name] &&
               stat_sources[host + '_os_totalmem']
             ) {
               debug('__create_freemem', name, this.$options['stat_sources'][source])
@@ -889,7 +851,7 @@ export default {
               // this.$set(this.available_charts[source].wrapper, 'props', {})
               // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
 
-              // this.set_chart_visibility(name, true)
+              this.set_chart_visibility(name, true)
 
               this.$on('stat_sources', function () {
                 let re = /_os_freemem$/
@@ -942,7 +904,6 @@ export default {
           // __create_os_networkInterfaces_stats_packets_drop_err(this.$options.tabular_sources)
           // __create_os_mounts(this.$options.tabular_sources)
           __create_cpus_percentage(this.$options.tabular_sources)
-          __create_os_loadavg(this.$options.tabular_sources)
           /**
           * should we turn it off??
           **/

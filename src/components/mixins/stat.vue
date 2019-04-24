@@ -21,7 +21,7 @@ export default {
   /**
   * set/modified by graph.vue or your own logic
   **/
-  focus: true,
+  // focus: true,
   visible: true,
 
   __range_init: false,

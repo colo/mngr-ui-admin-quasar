@@ -75,7 +75,8 @@ module.exports = function (ctx) {
       // Quasar plugins
       plugins: [
         'Notify',
-        'AddressbarColor'
+        'AddressbarColor',
+        'AppVisibility'
       ],
 
       // iconSet: 'fontawesome-v5',

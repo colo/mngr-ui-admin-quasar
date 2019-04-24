@@ -53,6 +53,7 @@ import dygraphWrapper from 'components/wrappers/dygraph'
 import vueEasyPieChartWrapper from 'components/wrappers/vueEasyPieChart'
 // import jqueryKnobWrapper from 'components/wrappers/jqueryKnob'
 import highchartsVueWrapper from 'components/wrappers/highchartsVue'
+import vueOdometerWrapper from 'components/wrappers/vueOdometer'
 
 // import easyPieChartWrapper from 'components/wrappers/easyPieChart'
 
@@ -71,8 +72,9 @@ export default {
     dygraphWrapper,
     vueEasyPieChartWrapper,
     // jqueryKnobWrapper,
-    highchartsVueWrapper
+    highchartsVueWrapper,
     // easyPieChartWrapper
+    vueOdometerWrapper
   },
 
   tabular: {
@@ -134,15 +136,13 @@ export default {
     // }
   },
 
-  // watch: {
-  //   'wrapper.props': {
-  //     handler: function (newValue) {
-  //       debug('wrapper props', newValue)
-  //     },
-  //     deep: true
-  //   }
-  //
-  // },
+  watch: {
+    '$q.appVisible': function (newVal, oldVal) {
+      debug('$q.appVisible', newVal)
+      this.$options.focus = newVal
+    }
+
+  },
 
   data () {
     return {
@@ -154,13 +154,20 @@ export default {
   created () {
     debug('created', this.id, this.wrapper, this.chart, this.chart_data)
 
-    window.addEventListener('blur', function () {
-      this.$options.focus = false
-    }.bind(this), false)
-
-    window.addEventListener('focus', function () {
-      this.$options.focus = true
-    }.bind(this), false)
+    /**
+    * maybe set an app option to allow user to choose if its want to  NOT update graphs
+    * when window.blur (loose focus it may be visible but not as primary window)
+    * right now updates graphs if "appVisible" (even on not primary windows)
+    **/
+    // window.addEventListener('blur', function () {
+    //   debug('$appVisible blur')
+    //   this.$options.focus = false
+    // }.bind(this), false)
+    //
+    // window.addEventListener('focus', function () {
+    //   debug('$appVisible focus')
+    //   this.$options.focus = true
+    // }.bind(this), false)
 
     this.create()
   },
