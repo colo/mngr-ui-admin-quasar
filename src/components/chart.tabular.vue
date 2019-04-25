@@ -1,9 +1,9 @@
 
 <script>
 import * as Debug from 'debug'
-const debug = Debug('mngr-ui:components:chart.tabular'),
-  debug_internals = Debug('mngr-ui:components:chart.tabular:Internals'),
-  debug_events = Debug('mngr-ui:components:chart.tabular:Events')
+const debug = Debug('mngr-ui:components:chart.tabular')
+// debug_internals = Debug('mngr-ui:components:chart.tabular:Internals'),
+// debug_events = Debug('mngr-ui:components:chart.tabular:Events')
 
 // let array_to_tabular = require( 'node-tabular-data' ).array_to_tabular
 // let number_to_tabular = require( 'node-tabular-data' ).number_to_tabular
@@ -22,6 +22,7 @@ export default {
 
   methods: {
     create () {
+      debug('create', this.id)
       /// ///console.log('create chart.tabular', this.id, this.chart)
 
       // if(this.$refs[this.id] && typeof this.$refs[this.id].create === 'function')
@@ -68,6 +69,8 @@ export default {
     //   }
     // },
     __update_data: function (data) {
+      debug('__update_data', this.id)
+
       if (data) {
         let inmediate = false
         if (this.chart_init === false) {
@@ -88,12 +91,13 @@ export default {
           current.push(row.value)
         })
 
-        // debug_internals('__create_watcher->generic_data_watcher',this.id, current, inmediate)
+        // debug('__create_watcher->generic_data_watcher',this.id, current, inmediate)
 
         this.update_chart_stat(this.id, current, inmediate)
       }
     },
     __process_chart (chart, name, stat) {
+      debug('__process_chart', this.id)
       /// /console.log('__process_chart', this.$options.stat_data, name, stat)
 
       if (chart.init && typeof chart.init === 'function') {
@@ -125,7 +129,7 @@ export default {
     //         data.push(row.value)
     //       })
     //
-    //       debug_internals('__create_watcher->generic_data_watcher',this.id, data, inmediate)
+    //       debug('__create_watcher->generic_data_watcher',this.id, data, inmediate)
     //
     //       this.update_chart_stat(this.id, data, inmediate)
     //

@@ -5,8 +5,11 @@
 // let nested_array_to_tabular = require( 'node-tabular-data' ).nested_array_to_tabular
 let data_to_tabular = require('node-tabular-data').data_to_tabular
 
-import graph from 'components/mixins/graph'
-import stat from 'components/mixins/stat'
+import * as Debug from 'debug'
+const debug = Debug('mngr-ui:components:chart')
+
+import graph from '@mixins/graph'
+import stat from '@mixins/stat'
 
 export default {
   mixins: [graph, stat],
@@ -39,11 +42,15 @@ export default {
     //   this.$options.visible = isVisible
     // },
 
+    // mounted () {
+    //   this.$set(this, 'chart_init', false)
+    // },
     create () {
+      debug('create', this.id)
       // console.log('chart.vue create', this.id, this.stat_data)
       // if(this.$refs[this.id] && typeof this.$refs[this.id].create === 'function')
       //   this.$refs[this.id].create()
-
+      // this.$set(this, 'chart_init', false)
       this.$options.tabular = {
         lastupdate: 0,
         data: []
@@ -76,7 +83,9 @@ export default {
     //   }
     // },
     __update_data: function (data) {
-      if (data && data.length > 1) {
+      debug('__update_data', this.id, data, this.chart_init)
+
+      if (data && data.length > 0) {
         // if(this.$options.__chart_init ==== false){
         if (this.chart_init === false) {
           this.__process_stat(this.chart, this.id, data)
@@ -90,6 +99,7 @@ export default {
     * copied to mngr-ui-admin-app/os
     **/
     __process_stat (chart, name, stat) {
+      debug('__process_stat', this.id)
       // console.log('__process_stat', name, stat)
       if (!Array.isArray(stat)) { stat = [stat] }
 
@@ -131,6 +141,8 @@ export default {
     * copied to mngr-ui-admin-app/os
     **/
     __process_chart (chart, name, stat) {
+      debug('__process_chart', this.id)
+
       /// ///console.log('__process_chart', this.stat_data, name, stat)
 
       if (chart.init && typeof chart.init === 'function') {

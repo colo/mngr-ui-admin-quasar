@@ -564,10 +564,14 @@ export default {
                         // animated: false,
                         'font-size': '14px',
                         'bar-color': function (percentage) {
-                          if (percentage > 0 && percentage < 33) {
+                          if (percentage > 0 && percentage < 20) {
                             return '#86b300'
-                          } else if (percentage > 33 && percentage < 66) {
+                          } else if (percentage > 20 && percentage < 40) {
+                            return '#eef65a'
+                          } else if (percentage > 40 && percentage < 60) {
                             return '#f6d95b'
+                          } else if (percentage > 60 && percentage < 80) {
+                            return '#f6a05a'
                           } else {
                             return '#ff704d'
                           }
@@ -771,6 +775,127 @@ export default {
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
+      let __create_os_uptime = function (tabular_sources) {
+        let re = /_os_uptime$/
+
+        Object.each(tabular_sources, function (data, source) {
+          if (re.test(source)) {
+            debug('PRE __create_os_uptime', source, this.$options['tabular_sources'][source])
+
+            let host = source.substring(0, source.indexOf('_'))
+            let name = source + '_odometer'
+            if (
+              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
+            ) {
+              debug('__create_os_uptime', name, this.$options['tabular_sources'][source])
+
+              this.$set(this.available_charts, name, Object.merge(
+                Object.clone({
+                  name: name,
+                  chart: undefined,
+                  init: undefined,
+                  stop: undefined,
+                  tabular: true, // this is for component, if not set, it's "chart-tabular"
+                  wrapper: {
+                    type: 'vue-odometer',
+                    props: {
+                      // decimals: 2,
+                      options: {
+                        // theme: 'car'
+                        duration: 200
+                      }
+                    }
+                  },
+                  stat: {
+                    merged: false,
+                    // sources: [{type: 'stat', path: source}],
+                    data: [],
+                    // events: [{
+                    //   host: this.host,
+                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   // key: 'cpus',
+                    //   // length: this.seconds,
+                    //   tabular: false
+                    //   // range: this.range
+                    // }],
+                    length: 2,
+                    range: 2
+                  }
+                  /**
+                    * for __get_stat_for_chart
+                    **/
+                  // pipeline: {
+                  //   name: 'input.os'
+                  //   // // path: 'os',
+                  //   // range: true
+                  // }
+                })
+                // chart_payload,
+                // {
+                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                // }
+              ))
+
+              // this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
+              this.$set(this.available_charts[name], 'chart', {})
+
+              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+
+              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+
+              /**
+              * set color based on current theme
+              **/
+              // this.__set_chart_color(source)
+              // this.$set(this.available_charts[source].wrapper, 'props', {})
+              // this.$set(this.available_charts[source].wrapper.props, 'smoothness', this.dygraph_smoothness)
+
+              // this.set_chart_visibility(name, true)
+
+              this.$on('tabular_sources', function () {
+                let re = /_os_uptime$/
+                Object.each(this.$options['tabular_sources'], function (data, source) {
+                  if (re.test(source)) {
+                    let host = source.substring(0, source.indexOf('_'))
+                    let name = source + '_odometer'
+                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
+
+                    const seconds = this.$options['tabular_sources'][source].data[0][1]
+                    const minutes = seconds / 60
+                    const hours = minutes / 60
+                    const days = hours / 24
+                    let value = (days >= 1) ? days : ((hours >= 1) ? hours : ((minutes >= 1) ? minutes : seconds))
+
+                    debug('tabular_sources uptime', this.$options['tabular_sources'][source].data, seconds, minutes, hours, days, value)
+
+                    this.$set(this.available_charts[name].stat, 'data', [[[this.$options['tabular_sources'][source].data[0][0], value]]])
+
+                    this.$set(
+                      this.available_charts[name].chart,
+                      'skip',
+                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
+                    )
+
+                    this.$set(
+                      this.available_charts[name].chart,
+                      'interval',
+                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
+                    )
+                  }
+                }.bind(this))
+
+                // }
+              }.bind(this))
+            }
+            debug('os_uptime odometer', this.hosts_charts[host])
+          }
+        }.bind(this))
+
+        // let source = this.host + '_os_freemem'
+        // let chart_payload = this.$options.charts_payloads['os_freemem']
+      }.bind(this)
+
       let __create_freemem = function (stat_sources) {
         let re = /_os_freemem$/
 
@@ -803,10 +928,14 @@ export default {
                         // animated: false,
                         'font-size': '14px',
                         'bar-color': function (percentage) {
-                          if (percentage > 0 && percentage < 33) {
+                          if (percentage > 0 && percentage < 20) {
                             return '#ff704d'
-                          } else if (percentage > 33 && percentage < 66) {
+                          } else if (percentage > 20 && percentage < 40) {
+                            return '#f6a05a'
+                          } else if (percentage > 40 && percentage < 60) {
                             return '#f6d95b'
+                          } else if (percentage > 60 && percentage < 80) {
+                            return '#eef65a'
                           } else {
                             return '#86b300'
                           }
@@ -943,6 +1072,7 @@ export default {
           // __create_os_mounts(this.$options.tabular_sources)
           __create_cpus_percentage(this.$options.tabular_sources)
           __create_os_loadavg(this.$options.tabular_sources)
+          __create_os_uptime(this.$options.tabular_sources)
           /**
           * should we turn it off??
           **/
