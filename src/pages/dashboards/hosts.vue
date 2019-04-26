@@ -47,11 +47,12 @@
           style="width: 100%"
           :dark="$store.state.app.theme.current === 'slate'"
         >
-        <div class="row items-center justify-center">
+        <div class="row justify-center">
+          <!-- items-center  -->
           <template v-for="(chart, name) in hosts_charts[host]">
-            <div :key="host+'-'+name" class="column items-center">
-            <div class="col-4 text-grey q-pa-md">
-
+            <div :key="host+'-'+name" class="column">
+            <div class="col text-grey q-pa-md text-center">
+              <div class="text-caption">{{chart.label || chart.name}}</div>
               <component
                 :key="host+'-'+name+'component'"
                 :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
@@ -543,13 +544,16 @@ export default {
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
-              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
+              (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
+              this.$options['stat_sources'][host + '_os_cpus']
             ) {
               debug('__create_cpus_percentage', name, this.$options['tabular_sources'][source])
 
+              let cpus = this.$options['stat_sources'][host + '_os_cpus'].data[0].value.length
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
+                  label: 'CPUs [' + cpus + '] usage',
                   chart: undefined,
                   init: undefined,
                   stop: undefined,
@@ -678,6 +682,7 @@ export default {
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
+                  label: 'Load AVG',
                   chart: undefined,
                   init: undefined,
                   stop: undefined,
@@ -792,6 +797,7 @@ export default {
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
+                  label: undefined,
                   chart: undefined,
                   init: undefined,
                   stop: undefined,
@@ -866,10 +872,12 @@ export default {
                     const hours = minutes / 60
                     const days = hours / 24
                     let value = (days >= 1) ? days : ((hours >= 1) ? hours : ((minutes >= 1) ? minutes : seconds))
+                    let label = (days >= 1) ? 'Uptime in days' : ((hours >= 1) ? 'Uptime in hours' : ((minutes >= 1) ? 'Uptime in minutes' : 'Uptime in seconds'))
 
                     debug('tabular_sources uptime', this.$options['tabular_sources'][source].data, seconds, minutes, hours, days, value)
 
                     this.$set(this.available_charts[name].stat, 'data', [[[this.$options['tabular_sources'][source].data[0][0], value]]])
+                    this.$set(this.available_charts[name], 'label', label)
 
                     this.$set(
                       this.available_charts[name].chart,
@@ -911,9 +919,11 @@ export default {
             ) {
               debug('__create_freemem', name, this.$options['stat_sources'][source])
 
+              let totalmem = (stat_sources[host + '_os_totalmem'].data[0].value / 1024 / 1024 / 1024).toFixed(0)
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
+                  label: 'RAM [' + totalmem + ' GB] free ',
                   chart: undefined,
                   init: undefined,
                   stop: undefined,
