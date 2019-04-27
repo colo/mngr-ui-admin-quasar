@@ -37,6 +37,8 @@
       >
 
         <q-expansion-item
+          :icon="( !$route.params.host ) ? 'add_circle_outline' : 'remove_circle_outline'"
+          :to="( !$route.params.host ) ? { name: 'host', params: { host: host } } : { name: 'hosts' }"
           :id="host+'-collapsible'"
           :key="host+'-collapsible'"
           :label="host"
@@ -545,7 +547,7 @@ export default {
             let name = source + '_pie'
             if (
               (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
-              this.$options['dashboard_' + this.id]['stat_sources'][host + '_os_cpus']
+              this.$options['dashboard_' + this.id]['stat_sources'] && this.$options['dashboard_' + this.id]['stat_sources'][host + '_os_cpus']
             ) {
               debug('__create_cpus_percentage', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -1070,6 +1072,7 @@ export default {
         debug('$options.tabular_sources', this.$options.tabular_sources, this.$store.state['dashboard_' + this.id].instances, this.$store.state['dashboard_' + this.id].paths.length)
 
         if (
+          this.$options['dashboard_' + this.id] &&
           this.$options['dashboard_' + this.id].tabular_sources
           // &&
           // this.dashboard_instances &&
@@ -1096,6 +1099,7 @@ export default {
         debug('$options.stat_sources', this.$options['dashboard_' + this.id].stat_sources, this.id)
 
         if (
+          this.$options['dashboard_' + this.id] &&
           this.$options['dashboard_' + this.id].stat_sources
           // this.dashboard_instances &&
           // this.$store.state['dashboard_' + this.host].paths.length > 0
