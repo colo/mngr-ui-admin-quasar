@@ -48,6 +48,7 @@
           :content-inset-level="0"
           style="width: 100%"
           :dark="$store.state.app.theme.current === 'slate'"
+          :header-class="($store.state.app.theme.current === 'slate') ? 'text-white' : 'text-black'"
         >
         <div class="row justify-center">
           <!-- items-center  -->
