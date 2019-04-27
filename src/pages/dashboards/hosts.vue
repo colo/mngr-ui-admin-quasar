@@ -66,9 +66,10 @@
                   range: chart.stat.range,
                   length: chart.stat.length,
                   merged: chart.stat.merged,
-                  data: chart.stat.data
+                  data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state['dashboard_' + id][source.type+'_sources'][source.path]}) : chart.stat.data
                 }"
               >
+              <!-- data: chart.stat.data -->
               <!-- :stat="{
                 range: range,
                 length: chart.stat.length,
@@ -467,7 +468,7 @@ export default {
       //           stat: {
       //             merged: false,
       //             // sources: [{type: 'stat', path: source}],
-      //             data: [this.$options['stat_sources'][source].data],
+      //             data: [this.$store.state['dashboard_' + this.id].stat_sources[source].data],
       //             events: [{
       //               host: this.host,
       //               path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
@@ -500,8 +501,8 @@ export default {
       //       this.$set(this.available_charts[source], 'chart', Object.merge(
       //         Object.clone(dygraph_line_chart),
       //         {
-      //           skip: this.$options['stat_sources'][source].step - 1,
-      //           interval: this.$options['stat_sources'][source].step - 1
+      //           skip: this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1,
+      //           interval: this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1
       //         }
       //       ))
       //
@@ -515,19 +516,19 @@ export default {
       //       // this.set_chart_visibility(source, true)
       //
       //       this.$on('stat_sources', function () {
-      //         debug('on stat_sources', source, this.$options['stat_sources'][source])
-      //         this.$set(this.available_charts[source].stat, 'data', [this.$options['stat_sources'][source].data])
+      //         debug('on stat_sources', source, this.$store.state['dashboard_' + this.id].stat_sources[source])
+      //         this.$set(this.available_charts[source].stat, 'data', [this.$store.state['dashboard_' + this.id].stat_sources[source].data])
       //
       //         this.$set(
       //           this.available_charts[source].chart,
       //           'skip',
-      //           (this.available_charts[source].chart.skip > this.$options['stat_sources'][source].step) ? this.available_charts[source].chart.skip : this.$options['stat_sources'][source].step - 1
+      //           (this.available_charts[source].chart.skip > this.$store.state['dashboard_' + this.id].stat_sources[source].step) ? this.available_charts[source].chart.skip : this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1
       //         )
       //
       //         this.$set(
       //           this.available_charts[source].chart,
       //           'interval',
-      //           (this.available_charts[source].chart.interval > this.$options['stat_sources'][source].step) ? this.available_charts[source].chart.interval : this.$options['stat_sources'][source].step - 1
+      //           (this.available_charts[source].chart.interval > this.$store.state['dashboard_' + this.id].stat_sources[source].step) ? this.available_charts[source].chart.interval : this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1
       //         )
       //       })
       //     }
@@ -539,17 +540,17 @@ export default {
 
         Object.each(tabular_sources, function (data, source) {
           if (re.test(source)) {
-            debug('PRE __create_cpus_percentage', source, this.$options['tabular_sources'][source])
+            debug('PRE __create_cpus_percentage', source, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
               (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
-              this.$options['stat_sources'][host + '_os_cpus']
+              this.$store.state['dashboard_' + this.id].stat_sources[host + '_os_cpus']
             ) {
-              debug('__create_cpus_percentage', name, this.$options['tabular_sources'][source])
+              debug('__create_cpus_percentage', name, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
-              let cpus = this.$options['stat_sources'][host + '_os_cpus'].data[0].value.length
+              let cpus = this.$store.state['dashboard_' + this.id].stat_sources[host + '_os_cpus'][0].value.length
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
@@ -585,8 +586,8 @@ export default {
                   },
                   stat: {
                     merged: false,
-                    // sources: [{type: 'stat', path: source}],
-                    data: [this.$options['tabular_sources'][source].data],
+                    sources: [{ type: 'tabular', path: source }],
+                    // data: [this.$options['tabular_sources'][source].data],
                     // events: [{
                     //   host: this.host,
                     //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
@@ -596,7 +597,7 @@ export default {
                     //   // range: this.range
                     // }],
                     length: 2,
-                    range: 2
+                    range: 1
                   }
                   /**
                     * for __get_stat_for_chart
@@ -629,33 +630,33 @@ export default {
 
               // this.set_chart_visibility(name, true)
 
-              this.$on('tabular_sources', function () {
-                let re = /_os_cpus_percentage$/
-                Object.each(this.$options['tabular_sources'], function (data, source) {
-                  if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
-                    let name = source + '_pie'
-                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
-
-                    // if(this.$options['stat_sources'][source] !== undefined){
-                    this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'skip',
-                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
-                    )
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'interval',
-                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
-                    )
-                  }
-                }.bind(this))
-
-                // }
-              }.bind(this))
+              // this.$on('tabular_sources', function () {
+              //   let re = /_os_cpus_percentage$/
+              //   Object.each(this.$options['tabular_sources'], function (data, source) {
+              //     if (re.test(source)) {
+              //       let host = source.substring(0, source.indexOf('_'))
+              //       let name = source + '_pie'
+              //       debug('on tabular_sources', name, this.$options['tabular_sources'][source])
+              //
+              //       // if(this.$store.state['dashboard_' + this.id].stat_sources[source] !== undefined){
+              //       this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
+              //
+              //       this.$set(
+              //         this.available_charts[name].chart,
+              //         'skip',
+              //         (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
+              //       )
+              //
+              //       this.$set(
+              //         this.available_charts[name].chart,
+              //         'interval',
+              //         (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
+              //       )
+              //     }
+              //   }.bind(this))
+              //
+              //   // }
+              // }.bind(this))
             }
             debug('cpus_percentage pie', this.hosts_charts[host])
           }
@@ -670,14 +671,14 @@ export default {
 
         Object.each(tabular_sources, function (data, source) {
           if (re.test(source)) {
-            debug('PRE __create_os_loadavg', source, this.$options['tabular_sources'][source])
+            debug('PRE __create_os_loadavg', source, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_odometer'
             if (
               !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
             ) {
-              debug('__create_os_loadavg', name, this.$options['tabular_sources'][source])
+              debug('__create_os_loadavg', name, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
@@ -699,8 +700,8 @@ export default {
                   },
                   stat: {
                     merged: false,
-                    // sources: [{type: 'stat', path: source}],
-                    data: [this.$options['tabular_sources'][source].data],
+                    sources: [{ type: 'tabular', path: source }],
+                    // data: [this.$options['tabular_sources'][source].data],
                     // events: [{
                     //   host: this.host,
                     //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
@@ -710,7 +711,7 @@ export default {
                     //   // range: this.range
                     // }],
                     length: 2,
-                    range: 2
+                    range: 1
                   }
                   /**
                     * for __get_stat_for_chart
@@ -744,33 +745,33 @@ export default {
 
               // this.set_chart_visibility(name, true)
 
-              this.$on('tabular_sources', function () {
-                let re = /_os_loadavg$/
-                Object.each(this.$options['tabular_sources'], function (data, source) {
-                  if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
-                    let name = source + '_odometer'
-                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
-
-                    // if(this.$options['stat_sources'][source] !== undefined){
-                    this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'skip',
-                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
-                    )
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'interval',
-                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
-                    )
-                  }
-                }.bind(this))
-
-                // }
-              }.bind(this))
+              // this.$on('tabular_sources', function () {
+              //   let re = /_os_loadavg$/
+              //   Object.each(this.$options['tabular_sources'], function (data, source) {
+              //     if (re.test(source)) {
+              //       let host = source.substring(0, source.indexOf('_'))
+              //       let name = source + '_odometer'
+              //       debug('on tabular_sources', name, this.$options['tabular_sources'][source])
+              //
+              //       // if(this.$store.state['dashboard_' + this.id].stat_sources[source] !== undefined){
+              //       this.$set(this.available_charts[name].stat, 'data', [this.$options['tabular_sources'][source].data])
+              //
+              //       this.$set(
+              //         this.available_charts[name].chart,
+              //         'skip',
+              //         (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
+              //       )
+              //
+              //       this.$set(
+              //         this.available_charts[name].chart,
+              //         'interval',
+              //         (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
+              //       )
+              //     }
+              //   }.bind(this))
+              //
+              //   // }
+              // }.bind(this))
             }
             debug('os_loadavg odometer', this.hosts_charts[host])
           }
@@ -785,14 +786,14 @@ export default {
 
         Object.each(tabular_sources, function (data, source) {
           if (re.test(source)) {
-            debug('PRE __create_os_uptime', source, this.$options['tabular_sources'][source])
+            debug('PRE __create_os_uptime', source, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_odometer'
             if (
               !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
             ) {
-              debug('__create_os_uptime', name, this.$options['tabular_sources'][source])
+              debug('__create_os_uptime', name, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
@@ -825,7 +826,7 @@ export default {
                     //   // range: this.range
                     // }],
                     length: 2,
-                    range: 2
+                    range: 1
                   }
                   /**
                     * for __get_stat_for_chart
@@ -861,35 +862,35 @@ export default {
 
               this.$on('tabular_sources', function () {
                 let re = /_os_uptime$/
-                Object.each(this.$options['tabular_sources'], function (data, source) {
+                Object.each(this.$store.state['dashboard_' + this.id].tabular_sources, function (data, source) {
                   if (re.test(source)) {
                     let host = source.substring(0, source.indexOf('_'))
                     let name = source + '_odometer'
-                    debug('on tabular_sources', name, this.$options['tabular_sources'][source])
+                    debug('on tabular_sources', name, this.$store.state['dashboard_' + this.id].tabular_sources[source])
 
-                    const seconds = this.$options['tabular_sources'][source].data[0][1]
+                    const seconds = this.$store.state['dashboard_' + this.id].tabular_sources[source][0][1]
                     const minutes = seconds / 60
                     const hours = minutes / 60
                     const days = hours / 24
                     let value = (days >= 1) ? days : ((hours >= 1) ? hours : ((minutes >= 1) ? minutes : seconds))
                     let label = (days >= 1) ? 'Uptime in days' : ((hours >= 1) ? 'Uptime in hours' : ((minutes >= 1) ? 'Uptime in minutes' : 'Uptime in seconds'))
 
-                    debug('tabular_sources uptime', this.$options['tabular_sources'][source].data, seconds, minutes, hours, days, value)
+                    debug('tabular_sources uptime', this.$store.state['dashboard_' + this.id].tabular_sources[source], seconds, minutes, hours, days, value)
 
-                    this.$set(this.available_charts[name].stat, 'data', [[[this.$options['tabular_sources'][source].data[0][0], value]]])
+                    this.$set(this.available_charts[name].stat, 'data', [[[this.$store.state['dashboard_' + this.id].tabular_sources[source][0][0], value]]])
                     this.$set(this.available_charts[name], 'label', label)
 
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'skip',
-                      (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
-                    )
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'interval',
-                      (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
-                    )
+                    // this.$set(
+                    //   this.available_charts[name].chart,
+                    //   'skip',
+                    //   (this.available_charts[name].chart.skip > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['tabular_sources'][source].step - 1
+                    // )
+                    //
+                    // this.$set(
+                    //   this.available_charts[name].chart,
+                    //   'interval',
+                    //   (this.available_charts[name].chart.interval > this.$options['tabular_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['tabular_sources'][source].step - 1
+                    // )
                   }
                 }.bind(this))
 
@@ -909,7 +910,7 @@ export default {
 
         Object.each(stat_sources, function (data, source) {
           if (re.test(source)) {
-            debug('PRE __create_freemem', source, this.$options['stat_sources'][source])
+            debug('PRE __create_freemem', source, this.$store.state['dashboard_' + this.id].stat_sources[source])
 
             let host = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
@@ -917,9 +918,9 @@ export default {
               (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
               stat_sources[host + '_os_totalmem']
             ) {
-              debug('__create_freemem', name, this.$options['stat_sources'][source])
+              debug('__create_freemem', name, this.$store.state['dashboard_' + this.id].stat_sources[source], stat_sources[host + '_os_totalmem'])
 
-              let totalmem = (stat_sources[host + '_os_totalmem'].data[0].value / 1024 / 1024 / 1024).toFixed(0)
+              let totalmem = (stat_sources[host + '_os_totalmem'][0].value / 1024 / 1024 / 1024).toFixed(0)
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
@@ -955,8 +956,8 @@ export default {
                   },
                   stat: {
                     merged: false,
-                    // sources: [{type: 'stat', path: source}],
-                    data: [this.$options['stat_sources'][source].data],
+                    sources: [{ type: 'stat', path: source }],
+                    // data: [this.$store.state['dashboard_' + this.id].stat_sources[source]],
                     // events: [{
                     //   host: this.host,
                     //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
@@ -966,7 +967,7 @@ export default {
                     //   // range: this.range
                     // }],
                     length: 2,
-                    range: 2
+                    range: 1
                   }
                   /**
                     * for __get_stat_for_chart
@@ -985,7 +986,7 @@ export default {
               ))
 
               this.$set(this.available_charts[name], 'chart', Object.merge(Object.clone(pie_chart), {
-                totalmem: this.$options.stat_sources[host + '_os_totalmem'].data[0].value,
+                totalmem: this.$store.state['dashboard_' + this.id].stat_sources[host + '_os_totalmem'][0].value,
                 watch: {
                   /**
                   * @trasnform: diff between each value against its prev one
@@ -1030,33 +1031,33 @@ export default {
 
               // this.set_chart_visibility(name, true)
 
-              this.$on('stat_sources', function () {
-                let re = /_os_freemem$/
-                Object.each(this.$options['stat_sources'], function (data, source) {
-                  if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
-                    let name = source + '_pie'
-                    debug('on stat_sources', name, this.$options['stat_sources'][source])
-
-                    // if(this.$options['stat_sources'][source] !== undefined){
-                    this.$set(this.available_charts[name].stat, 'data', [this.$options['stat_sources'][source].data])
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'skip',
-                      (this.available_charts[name].chart.skip > this.$options['stat_sources'][source].step) ? this.available_charts[name].chart.skip : this.$options['stat_sources'][source].step - 1
-                    )
-
-                    this.$set(
-                      this.available_charts[name].chart,
-                      'interval',
-                      (this.available_charts[name].chart.interval > this.$options['stat_sources'][source].step) ? this.available_charts[name].chart.interval : this.$options['stat_sources'][source].step - 1
-                    )
-                  }
-                }.bind(this))
-
-                // }
-              }.bind(this))
+              // this.$on('stat_sources', function () {
+              //   let re = /_os_freemem$/
+              //   Object.each(this.$store.state['dashboard_' + this.id].stat_sources, function (data, source) {
+              //     if (re.test(source)) {
+              //       let host = source.substring(0, source.indexOf('_'))
+              //       let name = source + '_pie'
+              //       debug('on stat_sources', name, this.$store.state['dashboard_' + this.id].stat_sources[source])
+              //
+              //       // if(this.$store.state['dashboard_' + this.id].stat_sources[source] !== undefined){
+              //       this.$set(this.available_charts[name].stat, 'data', [this.$store.state['dashboard_' + this.id].stat_sources[source]])
+              //
+              //       // this.$set(
+              //       //   this.available_charts[name].chart,
+              //       //   'skip',
+              //       //   (this.available_charts[name].chart.skip > this.$store.state['dashboard_' + this.id].stat_sources[source].step) ? this.available_charts[name].chart.skip : this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1
+              //       // )
+              //       //
+              //       // this.$set(
+              //       //   this.available_charts[name].chart,
+              //       //   'interval',
+              //       //   (this.available_charts[name].chart.interval > this.$store.state['dashboard_' + this.id].stat_sources[source].step) ? this.available_charts[name].chart.interval : this.$store.state['dashboard_' + this.id].stat_sources[source].step - 1
+              //       // )
+              //     }
+              //   }.bind(this))
+              //
+              //   // }
+              // }.bind(this))
             }
             debug('freemem pie', this.hosts_charts[host])
           }
@@ -1067,22 +1068,22 @@ export default {
       }.bind(this)
 
       let __tabular_sources_event = function () {
-        debug('$options.tabular_sources', this.$options.tabular_sources, this.$store.state['dashboard_' + this.id].instances, this.$store.state['dashboard_' + this.id].paths.length)
+        debug('$options.tabular_sources', this.$store.state['dashboard_' + this.id].tabular_sources, this.$store.state['dashboard_' + this.id].instances, this.$store.state['dashboard_' + this.id].paths.length)
 
         if (
-          this.$options.tabular_sources
+          this.$store.state['dashboard_' + this.id].tabular_sources
           // &&
           // this.dashboard_instances &&
           // this.$store.state['dashboard_' + this.id].paths.length > 0
         ) {
-          debug('$options.tabular_sources TRUE', this.$options.tabular_sources, this.id)
+          debug('$options.tabular_sources TRUE', this.$store.state['dashboard_' + this.id].tabular_sources, this.id)
           // __create_from_tabular_sources(this.$options.tabular_sources)
           // __create_os_procs_percentage_cpu(this.$options.tabular_sources)
           // __create_os_networkInterfaces_stats_packets_drop_err(this.$options.tabular_sources)
           // __create_os_mounts(this.$options.tabular_sources)
-          __create_cpus_percentage(this.$options.tabular_sources)
-          __create_os_loadavg(this.$options.tabular_sources)
-          __create_os_uptime(this.$options.tabular_sources)
+          __create_cpus_percentage(this.$store.state['dashboard_' + this.id].tabular_sources)
+          __create_os_loadavg(this.$store.state['dashboard_' + this.id].tabular_sources)
+          __create_os_uptime(this.$store.state['dashboard_' + this.id].tabular_sources)
           /**
           * should we turn it off??
           **/
@@ -1093,16 +1094,17 @@ export default {
       this.$on('tabular_sources', __tabular_sources_event)
 
       let __stat_sources_event = function () {
-        debug('$options.stat_sources', this.$options.stat_sources, this.id)
+        debug('$options.stat_sources', this.$store.state['dashboard_' + this.id].stat_sources, this.id)
 
         if (
-          this.$options.stat_sources
+          this.$store.state['dashboard_' + this.id].stat_sources
           // this.dashboard_instances &&
           // this.$store.state['dashboard_' + this.host].paths.length > 0
         ) {
           debug('$options.stat_sources TRUE', this.$options.stat_sources, this.id)
           // __create_from_stat_sources(this.$options.stat_sources)
-          __create_freemem(this.$options.stat_sources)
+          // __create_freemem(this.$options.stat_sources)
+          __create_freemem(this.$store.state['dashboard_' + this.id].stat_sources)
 
           /**
           * should we turn it off??
@@ -1126,68 +1128,68 @@ export default {
     /**
     * MODIFED from original
     **/
-    __process_dashboard_data: function (payload) {
-      debug('__process_dashboard_data', payload)
-
-      // if (payload && payload.host === this.host) {
-      if (payload && payload.host) { // WATCH OUT - modified
-        // let type = (payload.tabular == true) ? 'tabular' : 'stat'
-        let { type } = payload
-
-        let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
-        // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
-        let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
-        let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
-
-        let counter = 0
-        if (payload[type]) {
-          if (Object.getLength(payload[type]) > 0) {
-            Object.each(payload[type], function (data, path) {
-              let new_path
-              let new_val
-              if (Array.isArray(data)) {
-                // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
-
-                if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
-                  // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path, value: data})
-                  this.__set_source(type, { key: payload.key + '_' + path, value: data, step: payload.step })
-                }
-              } else if (data) {
-                Object.each(data, function (value, key) {
-                  if (Array.isArray(value)) {
-                    // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
-
-                    if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
-                      // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key, value: value})
-                      this.__set_source(type, { key: payload.key + '_' + path + '_' + key, value: value, step: payload.step })
-                    }
-                  } else {
-                    // 3rd level, there is no need for more
-                    Object.each(value, function (val, sub_key) {
-                      if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
-                        // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key+'_'+sub_key, value: val})
-                        this.__set_source(type, { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val, step: payload.step })
-                      }
-                    }.bind(this))
-                  }
-                }.bind(this))
-              }
-
-              if (counter === Object.getLength(payload[type]) - 1) {
-                this.$set(this, init, true)
-                this.$emit(type + '_sources')
-                debug('emiting...' + type + '_sources')
-              }
-
-              counter++
-            }.bind(this))
-          }
-          // else{
-          //   this.$set(this, init, true)
-          // }
-        }
-      }
-    },
+    // __process_dashboard_data: function (payload) {
+    //   debug('__process_dashboard_data', payload)
+    //
+    //   // if (payload && payload.host === this.host) {
+    //   if (payload && payload.host) { // WATCH OUT - modified
+    //     // let type = (payload.tabular == true) ? 'tabular' : 'stat'
+    //     let { type } = payload
+    //
+    //     let init = (type === 'tabular') ? 'tabular_init' : 'stat_init'
+    //     // let iterate = (type === 'tabulars') ? payload.stats : payload.stats.data
+    //     let whitelist = (type === 'tabular') ? this.$options.tabular_whitelist : this.$options.stat_whitelist
+    //     let blacklist = (type === 'tabular') ? this.$options.tabular_blacklist : this.$options.stat_blacklist
+    //
+    //     let counter = 0
+    //     if (payload[type]) {
+    //       if (Object.getLength(payload[type]) > 0) {
+    //         Object.each(payload[type], function (data, path) {
+    //           let new_path
+    //           let new_val
+    //           if (Array.isArray(data)) {
+    //             // if((whitelist && whitelist.test(path)) || (blacklist && !blacklist.test(path)))
+    //
+    //             if (this.__white_black_lists_filter(whitelist, blacklist, path)) {
+    //               // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path, value: data})
+    //               this.__set_source(type, { key: payload.key + '_' + path, value: data, step: payload.step })
+    //             }
+    //           } else if (data) {
+    //             Object.each(data, function (value, key) {
+    //               if (Array.isArray(value)) {
+    //                 // if((whitelist && whitelist.test(path+'.'+key)) || (blacklist && !blacklist.test(path+'.'+key)))
+    //
+    //                 if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key)) {
+    //                   // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key, value: value})
+    //                   this.__set_source(type, { key: payload.key + '_' + path + '_' + key, value: value, step: payload.step })
+    //                 }
+    //               } else {
+    //                 // 3rd level, there is no need for more
+    //                 Object.each(value, function (val, sub_key) {
+    //                   if (this.__white_black_lists_filter(whitelist, blacklist, path + '_' + key + '_' + sub_key)) {
+    //                     // this.$store.commit(type+'_sources/add', {key: payload.key+'_'+path+'_'+key+'_'+sub_key, value: val})
+    //                     this.__set_source(type, { key: payload.key + '_' + path + '_' + key + '_' + sub_key, value: val, step: payload.step })
+    //                   }
+    //                 }.bind(this))
+    //               }
+    //             }.bind(this))
+    //           }
+    //
+    //           if (counter === Object.getLength(payload[type]) - 1) {
+    //             this.$set(this, init, true)
+    //             this.$emit(type + '_sources')
+    //             debug('emiting...' + type + '_sources')
+    //           }
+    //
+    //           counter++
+    //         }.bind(this))
+    //       }
+    //       // else{
+    //       //   this.$set(this, init, true)
+    //       // }
+    //     }
+    //   }
+    // },
     __set_source: function (type, payload) {
       payload.key = payload.key.replace(/\./g, '_')
       payload.key = payload.key.replace(/%/g, 'percentage_') // prev to eslint, is it right? /\%/g
