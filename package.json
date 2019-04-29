@@ -19,6 +19,7 @@
     "moment": "^2.24.0",
     "mootools": "^1.5.2",
     "mootools-core-dist": "^1.5.1-dist",
+    "node-app-http-client": "git+https://github.com/colo/node-app-http-client.git",
     "node-app-socket.io-client": "git+https://github.com/colo/node-app-socket.io-client.git",
     "node-tabular-data": "git+https://github.com/colo/node-tabular-data.git",
     "odometer": "^0.4.8",

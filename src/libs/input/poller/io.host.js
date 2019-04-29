@@ -5,6 +5,10 @@
 // const App = require ( '../../node_modules/node-app-couchdb-client/index' )
 const App = require('node-app-socket.io-client/index')
 
+import DefaultConn from '@etc/default.io'
+const HttpRestClient = require('node-app-http-client/index')
+
+
 // import { throttle } from 'quasar'
 import * as Debug from 'debug'
 
@@ -12,12 +16,54 @@ const debug = Debug('mngr-ui:libs:input:io.host')
   // debug_internals = Debug('mngr-ui:libs:input:io.host:Internals'),
   // debug_events = Debug('mngr-ui:libs:input:io.host:Events')
 
+let http_rest_client = new Class({
+  Extends: HttpRestClient,
+
+  ON_DATA: 'onData',
+
+  options: {
+    path: '/hosts',
+
+    api:{
+      routes: {
+
+  			get: [
+  				{
+  					path: ':host/data/',
+  					callbacks: ['data'],
+  					//version: '',
+  				},
+  				// {
+  				// 	path: '',
+  				// 	callbacks: ['data'],
+  				// 	//version: '',
+  				// },
+  			]
+  		},
+    },
+
+
+  },
+
+  data: function(req, res, data, opts){
+    debug('rest client data %o %o', JSON.parse(data), opts)
+    if(data)
+      this.fireEvent(this.ON_DATA, JSON.parse(data))
+  },
+  initialize: function(options){
+    this.parent(options)
+    // this.fireEvent(this.ON_CONNECT)
+    debug('initialize', this.options)
+  },
+})
+
 import HostsIO from '@etc/hosts.io'
 
 export default new Class({
   Extends: App,
 
   registered: false,
+  http_rest_client: undefined,
 
   options: {
 
@@ -29,6 +75,7 @@ export default new Class({
     status: undefined,
 
     stat_host: null,
+
 
   	requests: {
       range: [
@@ -60,69 +107,70 @@ export default new Class({
                     stats_events_biggest_range.start = (stats_events_biggest_range.start > range.start) ? stats_events_biggest_range.start : range.start
                     stats_events_biggest_range.end = (stats_events_biggest_range.end > range.end) ? stats_events_biggest_range.end : range.end
                   }
-                  // this.io.emit('stats', {
-                  //   host: app.options.stat_host,
-                  //   stat: event.path,
-                  //   format: (event.tabular == true) ? 'tabular' : undefined,
-                  //   // range: req.opt.range
-                  //   range: event.Range
-      						// })
+
                 } else if (!event.path) {
-                  this.io.emit('/', {
+                  app.io.emit('/', {
                     host: app.options.stat_host,
                     prop: 'data',
                     format: (event.tabular == true) ? 'tabular' : 'stat',
                     range: event.Range
                   })
 
-                  // this.io.emit('stats', {
-                  //   host: app.options.stat_host,
-                  //   format: (event.tabular == true) ? 'tabular' : undefined,
-                  //   range: event.Range
-      						// })
+
                 }
 
                 if (index == req.opt.range.length - 1) {
-                  debug('SORT_BY_PATH RANGE', JSON.stringify(tabulars_events_paths), JSON.stringify(stats_events_paths))
+
 
                   if (tabulars_events_paths.length > 0) {
-                    this.io.emit('/', {
-                      host: app.options.stat_host,
-                      prop: 'data',
-                      format: 'tabular',
-                      paths: JSON.stringify(tabulars_events_paths),
-                      // range: event.Range
-                      range: 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
+                    debug('SORT_BY_PATH RANGE', JSON.stringify(tabulars_events_paths), JSON.stringify(stats_events_paths))
+                    // app.io.emit('/', {
+                    //   host: app.options.stat_host,
+                    //   prop: 'data',
+                    //   format: 'tabular',
+                    //   paths: JSON.stringify(tabulars_events_paths),
+                    //   // range: event.Range
+                    //   range: 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
+                    // })
+                    app.http_rest_client.api.get({
+                      uri: app.options.stat_host+'/data/',
+                      // uri: '',
+                      headers: {
+          							'Accept': 'application/json',
+                        'Range': 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
+          						},
+                      qs: {
+                        format: 'tabular',
+                        paths: tabulars_events_paths
+          						}
                     })
                   }
-
-                  // this.io.emit('stats', {
-                  //   host: app.options.stat_host,
-                  //   stat: JSON.stringify(tabulars_events_paths),
-                  //   format: 'tabular',
-                  //   // range: req.opt.range
-                  //   range: "posix "+tabulars_events_biggest_range.start+"-"+tabulars_events_biggest_range.end+"/*"
-                  // })
 
                   if (stats_events_paths.length > 0) {
-                    this.io.emit('/', {
-                      host: app.options.stat_host,
-                      prop: 'data',
-                      format: 'stat',
-                      paths: JSON.stringify(stats_events_paths),
-                      // range: event.Range
-                      range: 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+                    // app.io.emit('/', {
+                    //   host: app.options.stat_host,
+                    //   prop: 'data',
+                    //   format: 'stat',
+                    //   paths: JSON.stringify(stats_events_paths),
+                    //   // range: event.Range
+                    //   range: 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+                    // })
+                    app.http_rest_client.api.get({
+                      uri: app.options.stat_host+'/data/',
+                      // uri: '',
+                      headers: {
+          							'Accept': 'application/json',
+                        'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+          						},
+                      qs: {
+                        format: 'stat',
+                        paths: stats_events_paths
+          						}
                     })
                   }
-                  // this.io.emit('stats', {
-                  //   host: app.options.stat_host,
-                  //   stat: JSON.stringify(stats_events_paths),
-                  //   format: undefined,
-                  //   // range: req.opt.range
-                  //   range: "posix "+stats_events_biggest_range.start+"-"+stats_events_biggest_range.end+"/*"
-                  // })
+
                 }
-              }.bind(this))
+              }.bind(app))
             }
 
             // }, 500)
@@ -200,6 +248,7 @@ export default new Class({
       ]
 
     },
+
 
     io: {
       // middlewares: [], //namespace.use(fn)
@@ -283,6 +332,11 @@ export default new Class({
     }
 
   },
+  // rest_get: function(rest_options){
+  //   debug('rest_get', rest_options)
+  //   // process.exit(1)
+  //   this.http_rest_client.api.get(rest_options)
+  // },
   register: function (socket, next, result) {
     debug('register %o', result)
   },
@@ -388,9 +442,15 @@ export default new Class({
   initialize: function (options) {
     this.parent(options)// override default options
 
+
     this.profile('root_init')// start profiling
 
     this.add_io(HostsIO)
+
+    this.http_rest_client = new http_rest_client(DefaultConn)
+    this.http_rest_client.addEvent(this.http_rest_client.ON_DATA, function(data){
+      this.data(undefined, undefined, data)
+    }.bind(this))
 
     // this.addEvent('onConnect', function(){
     debug('initialize socket.onConnect', this.io.id)
