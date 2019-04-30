@@ -5,7 +5,7 @@
 // const App = require ( '../../node_modules/node-app-couchdb-client/index' )
 const App = require('node-app-socket.io-client/index')
 
-import DefaultConn from '@etc/default.io'
+import DefaultConn from '@etc/default.rest'
 const HttpRestClient = require('node-app-http-client/index')
 
 
@@ -132,6 +132,18 @@ export default new Class({
                     //   // range: event.Range
                     //   range: 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
                     // })
+                    debug('SORT_BY_PATH RANGE data',{
+                      uri: app.options.stat_host+'/data/',
+                      // uri: '',
+                      headers: {
+          							'Accept': 'application/json',
+                        'Range': 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
+          						},
+                      qs: {
+                        format: 'tabular',
+                        paths: tabulars_events_paths
+          						}
+                    })
                     app.http_rest_client.api.get({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
@@ -155,6 +167,18 @@ export default new Class({
                     //   // range: event.Range
                     //   range: 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
                     // })
+                    debug('SORT_BY_PATH RANGE data',{
+                      uri: app.options.stat_host+'/data/',
+                      // uri: '',
+                      headers: {
+          							'Accept': 'application/json',
+                        'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+          						},
+                      qs: {
+                        format: 'stat',
+                        paths: stats_events_paths
+          						}
+                    })
                     app.http_rest_client.api.get({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
