@@ -182,10 +182,7 @@ export default {
 
   tabular_sources: undefined,
   stat_sources: undefined,
-
-  DATA_POINTS_PER_MINUTE: 60,
-  MAX_DATA_POINTS: 0,
-  DEFAULT_RANGE: [],
+  MAX_DATA_POINTS: 300,
 
   __pipelines_events: {},
   pipelines: {},
@@ -270,8 +267,7 @@ export default {
         if (this.id && state['dashboard_' + this.id] && state['dashboard_' + this.id].range.length > 0) {
           return state['dashboard_' + this.id].range
         } else {
-          // return [Date.now() - (MINUTE * 5), Date.now()]
-          return this.$options.DEFAULT_RANGE
+          return [Date.now() - (MINUTE * 5), Date.now()]
         }
       },
 
@@ -324,11 +320,9 @@ export default {
     this.$eventbus.$off('host')
   },
 
-  created: function () {
-    let _plataform_minutes = (this.$q.platform.is.mobile) ? 1 : 5
-    this.$options.MAX_DATA_POINTS = this.$options.DATA_POINTS_PER_MINUTE * _plataform_minutes
-    this.$options.DEFAULT_RANGE = [Date.now() - (MINUTE * _plataform_minutes), Date.now()]
-  },
+  // created: function () {
+  //   this.id = this.id
+  // },
 
   // updated: function(){
   //   debug('updated', this.$route.params.host)
@@ -752,12 +746,12 @@ export default {
       }.bind(this)
 
       let __create_freemem = function (stat_sources) {
-        debug('__create_freemem dygraph', this.id, stat_sources[this.host + '_os_totalmem'], stat_sources[this.host + '_os_freemem'])
+        // debug('__create_freemem', this.$options.charts_payloads['os_freemem'])
         let source = this.host + '_os_freemem'
         let chart_payload = this.$options.charts_payloads['os_freemem']
         if (
-          !this.available_charts[source]
-          // && stat_sources[this.host + '_os_totalmem']
+          !this.available_charts[source] &&
+          stat_sources[this.host + '_os_totalmem']
         ) {
           this.$set(this.available_charts, source, Object.merge(
             Object.clone({
@@ -805,7 +799,7 @@ export default {
           this.$set(this.available_charts[source], 'chart', Object.merge(
             chart_payload.chart,
             {
-              totalmem: (stat_sources[this.host + '_os_totalmem'] && stat_sources[this.host + '_os_totalmem'].data[0].value) ? stat_sources[this.host + '_os_totalmem'].data[0].value : stat_sources[this.host + '_os_freemem'].data[0].value,
+              totalmem: this.$options.stat_sources[this.host + '_os_totalmem'].data[0].value,
               skip: this.$options['stat_sources'][source].step - 1,
               interval: this.$options['stat_sources'][source].step - 1
             }
@@ -823,13 +817,6 @@ export default {
           this.$on('stat_sources', function () {
             debug('on stat_sources', source, this.$options['stat_sources'][source])
             // if(this.$options['stat_sources'][source] !== undefined){
-            if (this.$options.stat_sources[this.host + '_os_totalmem'] && this.$options.stat_sources[this.host + '_os_totalmem'].data[0].value) {
-              this.$set(this.available_charts[source].chart.options, 'valueRange', [
-                0,
-                Math.round((this.$options.stat_sources[this.host + '_os_totalmem'].data[0].value / 1024) / 1024)
-              ])
-            }
-
             this.$set(this.available_charts[source].stat, 'data', [this.$options['stat_sources'][source].data])
 
             this.$set(

@@ -136,6 +136,7 @@ export default new Class({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
                       headers: {
+                        'Content-Type': 'application/json',
           							'Accept': 'application/json',
                         'Range': 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
           						},
@@ -148,6 +149,7 @@ export default new Class({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
                       headers: {
+                        'Content-Type': 'application/json',
           							'Accept': 'application/json',
                         'Range': 'posix ' + tabulars_events_biggest_range.start + '-' + tabulars_events_biggest_range.end + '/*'
           						},
@@ -171,6 +173,7 @@ export default new Class({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
                       headers: {
+                        'Content-Type': 'application/json',
           							'Accept': 'application/json',
                         'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
           						},
@@ -183,6 +186,7 @@ export default new Class({
                       uri: app.options.stat_host+'/data/',
                       // uri: '',
                       headers: {
+                        'Content-Type': 'application/json',
           							'Accept': 'application/json',
                         'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
           						},

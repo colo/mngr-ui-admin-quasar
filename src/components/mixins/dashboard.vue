@@ -1025,9 +1025,10 @@ export default {
   created: function () {
     debug('life cycle created', this.id)
 
-    this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
+    // this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
+    this.$options.__events_watcher = this.$watch('events', function (newVal, old) {
       if (process.env.DEV) debug('events', newVal)
-      // this.$options.__events_watcher = this.$watch('events', function(newVal, old){
+
       let val = Array.clone(newVal)
       // if(val && val.length > 0 && val.length > old.length){
       // if(this.all_init === true && val && val.length > 0){
@@ -1083,8 +1084,9 @@ export default {
         //   this.$nextTick(this.$store.commit('dashboard_'+this.id+'/events/remove', val[e_index]))
         // }.bind(this))
       }
-    }, 200))
-    // })
+    // }, 50))
+    // }, 200))
+    })
 
     document.addEventListener('beforeunload', function () {
       this.__clean_destroy()

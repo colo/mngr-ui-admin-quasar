@@ -147,18 +147,19 @@ export default {
 
       if (chart.init && typeof chart.init === 'function') {
         chart.init(this, chart, name, stat, 'chart')
-        this.$set(this, 'chart_init', true)
-      } else {
-        this.$set(this, 'chart_init', true)
+        // this.$set(this, 'chart_init', true)
       }
+      // else {
+      this.$set(this, 'chart_init', true)
+      // }
 
       /**
       * first update
       **/
       // if(this.stat_data.length > 0){
-      if (stat.length > 0) {
-        data_to_tabular(stat, chart, name, this.update_chart_stat.bind(this))
-      }
+      // if (stat.length > 0) {
+      //   data_to_tabular(stat, chart, name, this.update_chart_stat.bind(this))
+      // }
 
       // this.__create_watcher(name, chart)
     }
