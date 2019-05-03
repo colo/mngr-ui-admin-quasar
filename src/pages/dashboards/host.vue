@@ -519,7 +519,7 @@ export default {
     * if remaining !== false => return os_mounts.1, else => os_mounts
     **/
     __match_source_paths: function (source, paths, remaining) {
-      debug('__match_source_paths', source, paths)
+      // debug('__match_source_paths', source, paths)
       let path
 
       if (paths.contains(source) && paths.length > 0) {
@@ -536,6 +536,7 @@ export default {
         path = source
       }
 
+      debug('__match_source_paths', source, path)
       return path
     },
     __init_charts: function (next) {

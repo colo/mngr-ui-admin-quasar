@@ -28,6 +28,11 @@ let http_rest_client = new Class({
       routes: {
 
   			get: [
+          {
+  					path: 'minute/:host/data/',
+  					callbacks: ['data'],
+  					//version: '',
+  				},
   				{
   					path: ':host/data/',
   					callbacks: ['data'],
@@ -46,9 +51,13 @@ let http_rest_client = new Class({
   },
 
   data: function(req, res, data, opts){
-    debug('rest client data %o %o', JSON.parse(data), opts)
     if(data)
-      this.fireEvent(this.ON_DATA, JSON.parse(data))
+      data = JSON.parse(data)
+
+    debug('rest client data %o %o', data, opts)
+
+    if(data.from === 'periodical')
+      this.fireEvent(this.ON_DATA, data)
   },
   initialize: function(options){
     this.parent(options)
@@ -158,6 +167,9 @@ export default new Class({
                         paths: tabulars_events_paths
           						}
                     })
+
+
+
                   }
 
                   if (stats_events_paths.length > 0) {
@@ -193,6 +205,20 @@ export default new Class({
                       qs: {
                         format: 'stat',
                         paths: stats_events_paths
+          						}
+                    })
+
+                    app.http_rest_client.api.get({
+                      uri: 'minute/'+app.options.stat_host+'/data/',
+                      // uri: '',
+                      headers: {
+                        'Content-Type': 'application/json',
+          							'Accept': 'application/json',
+                        'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+          						},
+                      qs: {
+                        format: 'stat',
+                        // paths: 'os'
           						}
                     })
                   }

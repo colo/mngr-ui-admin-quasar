@@ -1025,8 +1025,8 @@ export default {
   created: function () {
     debug('life cycle created', this.id)
 
-    // this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
-    this.$options.__events_watcher = this.$watch('events', function (newVal, old) {
+    this.$options.__events_watcher = this.$watch('events', debounce(function (newVal, old) {
+    // this.$options.__events_watcher = this.$watch('events', function (newVal, old) {
       if (process.env.DEV) debug('events', newVal)
 
       let val = Array.clone(newVal)
@@ -1085,8 +1085,8 @@ export default {
         // }.bind(this))
       }
     // }, 50))
-    // }, 200))
-    })
+    }, 200))
+    // })
 
     document.addEventListener('beforeunload', function () {
       this.__clean_destroy()
