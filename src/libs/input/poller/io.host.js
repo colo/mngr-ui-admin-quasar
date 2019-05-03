@@ -208,19 +208,19 @@ export default new Class({
           						}
                     })
 
-                    app.http_rest_client.api.get({
-                      uri: 'minute/'+app.options.stat_host+'/data/',
-                      // uri: '',
-                      headers: {
-                        'Content-Type': 'application/json',
-          							'Accept': 'application/json',
-                        'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
-          						},
-                      qs: {
-                        format: 'stat',
-                        // paths: 'os'
-          						}
-                    })
+                    // app.http_rest_client.api.get({
+                    //   uri: 'minute/'+app.options.stat_host+'/data/',
+                    //   // uri: '',
+                    //   headers: {
+                    //     'Content-Type': 'application/json',
+          					// 		'Accept': 'application/json',
+                    //     'Range': 'posix ' + stats_events_biggest_range.start + '-' + stats_events_biggest_range.end + '/*'
+          					// 	},
+                    //   qs: {
+                    //     format: 'stat',
+                    //     // paths: 'os'
+          					// 	}
+                    // })
                   }
 
                 }
