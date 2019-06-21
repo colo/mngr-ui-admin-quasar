@@ -110,6 +110,15 @@
           </q-item-section>
         </q-item>
 
+        <q-item clickable to="/logs">
+          <q-item-section avatar>
+            <q-icon name="fas fa-tachometer-alt" class="text-grey"/>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-grey">Logs</q-item-label>
+            <!-- <q-item-label caption>v1.quasar-framework.org</q-item-label> -->
+          </q-item-section>
+        </q-item>
         <!-- <q-item clickable tag="a" to="/other">
           <q-item-section avatar>
             <q-icon name="home" />
