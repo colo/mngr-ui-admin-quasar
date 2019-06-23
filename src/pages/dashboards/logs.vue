@@ -28,21 +28,21 @@
     </dashboard-menu>
 
     <div class="row items-center justify-center" :dark="$store.state.app.theme.current === 'slate'">
-      <template v-for="host in $store.state['hosts'].all">
+      <template v-for="log in $store.state['logs'].all">
       <div
-      :key="host"
-      :class="(!$route.params.host) ? 'col-6' : 'col-12'"
-      v-if="!$route.params.host || host === $route.params.host"
+      :key="log"
+      :class="(!$route.params.log) ? 'col-6' : 'col-12'"
+      v-if="!$route.params.log || log === $route.params.log"
       :dark="$store.state.app.theme.current === 'slate'"
       >
 
         <q-expansion-item
-          :icon="( !$route.params.host ) ? 'add_circle_outline' : 'remove_circle_outline'"
-          :to="( !$route.params.host ) ? { name: 'host', params: { host: host } } : { name: 'hosts' }"
-          :id="host+'-collapsible'"
-          :key="host+'-collapsible'"
-          :label="host"
-          :name="host"
+          :icon="( !$route.params.log ) ? 'add_circle_outline' : 'remove_circle_outline'"
+          :to="( !$route.params.log ) ? { name: 'log', params: { log: log } } : { name: 'logs' }"
+          :id="log+'-collapsible'"
+          :key="log+'-collapsible'"
+          :label="log"
+          :name="log"
           default-opened
           :header-inset-level="0"
           :content-inset-level="0"
@@ -52,17 +52,17 @@
         >
         <div class="row justify-center">
           <!-- items-center  -->
-          <template v-for="(chart, name) in hosts_charts[host]">
-            <div :key="host+'-'+name" class="column">
+          <template v-for="(chart, name) in logs_charts[log]">
+            <div :key="log+'-'+name" class="column">
             <div class="col text-grey q-pa-md text-center">
               <div class="text-caption">{{chart.label || chart.name}}</div>
               <component
-                :key="host+'-'+name+'component'"
+                :key="log+'-'+name+'component'"
                 :is="chart.tabular === false ? 'chart' : 'chart-tabular'"
-                dashboard="hosts"
+                dashboard="logs"
                 :wrapper="chart.wrapper"
-                :ref="host+'-'+name"
-                :id="host+'-'+name"
+                :ref="log+'-'+name"
+                :id="log+'-'+name"
                 :EventBus="$eventbus"
                 :chart="chart.chart"
                 :stat="{
@@ -93,7 +93,7 @@
 
     <!-- https://stackoverflow.com/questions/40404787/best-practice-for-reacting-to-params-changes-with-vue-router -->
     <transition name="view" mode="out-in" appear>
-      <router-view :key="$route.params.host"/>
+      <router-view :key="$route.params.log"/>
     </transition>
 
   </q-page>
@@ -103,9 +103,9 @@
 
 import * as Debug from 'debug'
 
-const debug = Debug('mngr-ui:pages:dashboard:hosts')
-// const debug_internals = Debug('mngr-ui:pages:dashboard:hosts:Internals')
-// const debug_events = Debug('mngr-ui:pages:dashboard:hosts:Events')
+const debug = Debug('mngr-ui:pages:dashboard:logs')
+// const debug_internals = Debug('mngr-ui:pages:dashboard:logs:Internals')
+// const debug_events = Debug('mngr-ui:pages:dashboard:logs:Events')
 
 // import dashboardMixinDygraph from '@mixins/dashboard.dygraph'
 import dashboardDygraphMixin from '@mixins/dashboard.dygraph'
@@ -117,15 +117,15 @@ import dashboardMenuTabsPanelSettingsPerformanceGraph from '@components/dashboar
 import dashboardMenuTabsPanelSettingsPerformanceDygraph from '@components/dashboard/settings/performance.dygraph.vue'
 
 import Pipeline from 'js-pipeline'
-import HostsPipeline from '@libs/pipelines/hosts'
-import hostsStoreModule from 'src/store/hosts'
+import LogsPipeline from '@libs/pipelines/logs'
+import logsStoreModule from 'src/store/logs'
 
-import HostPipeline from '@libs/pipelines/hosts.host'
+import LogPipeline from '@libs/pipelines/logs.log'
 
 import pie_chart from 'mngr-ui-admin-charts/defaults/vueEasyPieChart'
 
 export default {
-  name: 'dashboard-hosts',
+  name: 'dashboard-logs',
 
   mixins: [dashboardDygraphMixin],
 
@@ -137,7 +137,7 @@ export default {
   },
 
   /**
-  * @start - from pages/dashboard/host.vue
+  * @start - from pages/dashboard/log.vue
   **/
   // tabular_sources: undefined,
   // stat_sources: undefined,
@@ -146,13 +146,13 @@ export default {
   tabular_whitelist: /os_cpus_percentage|os_loadavg|os_uptime/,
   // tabular_whitelist: /^[a-zA-Z0-9_.]+$/,
   /**
-  * @end - from pages/dashboard/host.vue
+  * @end - from pages/dashboard/log.vue
   **/
 
   data () {
     return {
-      hosts_charts: {},
-      id: 'hosts',
+      logs_charts: {},
+      id: 'logs',
       menuTabs: [
         { name: 'charts', label: 'Charts', active: true },
         { name: 'settings', label: 'Settings' }
@@ -160,13 +160,13 @@ export default {
       panels: {
         'charts': {
           menu: {
-            hosts: {
-              label: 'Hosts',
+            logs: {
+              label: 'Logs',
               icon: 'desktop_windows',
               route: {},
               menu: {
                 // colo: {
-                //   label: 'colo', icon: 'desktop_windows', route: { name: 'host', params: { host: 'colo' } }
+                //   label: 'colo', icon: 'desktop_windows', route: { name: 'log', params: { log: 'colo' } }
                 // }
               }
             }
@@ -215,31 +215,31 @@ export default {
   created: function () {
     debug('created')
     this.id = this.id
-    this.$eventbus.$on('host_menu', this.handleMenu.bind(this))
+    this.$eventbus.$on('log_menu', this.handleMenu.bind(this))
   },
   mounted: function () {
     debug('mounted')
 
     this.$set(this.panels.settings.performance.graph, 'always_update', this.graph_always_update)
     this.$set(this.panels.settings.performance.dygraph, 'smoothness', this.dygraph_smoothness)
-    this.__hosts_module()
+    this.__logs_module()
   },
   beforeUpdate: function () {
     debug('beforeUpdate')
-    if (!this.$route.params.host) { this.panels.charts.menu.host = undefined }
+    if (!this.$route.params.log) { this.panels.charts.menu.log = undefined }
   },
   beforeDestroy: function () {
     debug('life cycle beforeDestroy', this.id)
-    this.$eventbus.$off('hosts')
-    this.$eventbus.$off('hosts.host')
-    this.$eventbus.$off('host_menu')
+    this.$eventbus.$off('logs')
+    this.$eventbus.$off('logs.log')
+    this.$eventbus.$off('log_menu')
   },
   methods: {
 
-    __hosts_module: function () {
-      debug('__hosts_module')
+    __logs_module: function () {
+      debug('__logs_module')
 
-      if (!this.$store.state['hosts']) { this.$store.registerModule('hosts', hostsStoreModule) }
+      if (!this.$store.state['logs']) { this.$store.registerModule('logs', logsStoreModule) }
     },
     handleInput: function (payload) {
       this.$set(this.panels, 'settings', Object.merge(this.panels.settings, payload))
@@ -252,17 +252,17 @@ export default {
     /**
     * @start pipelines
     **/
-    create_pipelines: function (hosts, next) {
-      debug('create_pipelines', hosts)
+    create_pipelines: function (logs, next) {
+      debug('create_pipelines', logs)
 
-      if (hosts && Array.isArray(hosts)) {
-        Array.each(hosts, function (host) {
-          if (host) {
-            let template = Object.clone(HostPipeline)
+      if (logs && Array.isArray(logs)) {
+        Array.each(logs, function (log) {
+          if (log) {
+            let template = Object.clone(LogPipeline)
 
-            template.input[0].poll.conn[0].stat_host = host
+            template.input[0].poll.conn[0].stat_log = log
 
-            template.input[0].poll.id += '-' + host
+            template.input[0].poll.id += '-' + log
             template.input[0].poll.conn[0].id = template.input[0].poll.id
             let pipeline_id = template.input[0].poll.id
 
@@ -277,7 +277,7 @@ export default {
         }.bind(this))
       }
 
-      let template = Object.clone(HostsPipeline)
+      let template = Object.clone(LogsPipeline)
 
       let pipeline_id = template.input[0].poll.id
 
@@ -286,7 +286,7 @@ export default {
 
         this.$options.pipelines[pipeline_id] = pipe
       } else if (this.$options.pipelines[pipeline_id].inputs[0].options.suspended !== false) {
-        debug('HostsPipeline suspended', this.$options.pipelines[pipeline_id].inputs[0].options.suspended)
+        debug('LogsPipeline suspended', this.$options.pipelines[pipeline_id].inputs[0].options.suspended)
         this.$options.pipelines[pipeline_id].fireEvent('onResume')
       }
 
@@ -311,9 +311,11 @@ export default {
     /**
     * @overrides: mixins/dashboard
     **/
-    __create: function (id, next) { // process one event only ('host')
-      this.$eventbus.$on('hosts', this.__process_dashboard_hosts.bind(this))
-      this.$eventbus.$on('hosts.host', this.__process_dashboard_host.bind(this))
+    __create: function (id, next) { // process one event only ('log')
+      this.$eventbus.$on('logs', this.__process_dashboard_logs.bind(this))
+      this.$eventbus.$on('logs.log', this.__process_dashboard_log.bind(this))
+
+      this.__logs_module()// why __hosts_module isn't here on hosts.vue??
 
       let __init = function (next) {
         this.__init_charts()
@@ -325,17 +327,17 @@ export default {
       if (process.env.DEV) debug('__create', Object.getLength(this.$options.pipelines))
 
       if (Object.getLength(this.$options.pipelines) === 0) {
-        this.create_pipelines(this.$store.state['hosts'].all, __init.pass(next))
+        this.create_pipelines(this.$store.state['logs'].all, __init.pass(next))
       } else if (next) {
         __init(next())
       }
     },
     /**
-    * @start single host (from pages/dashboard/host.vue)
+    * @start single log (from pages/dashboard/log.vue)
     **/
     __init_charts: function (next) {
-      // this.$options.charts_payloads = host_charts_payloads({
-      //   host: this.host,
+      // this.$options.charts_payloads = log_charts_payloads({
+      //   log: this.log,
       //   // seconds: this.seconds,
       //   // seconds: 300,
       //   range: this.range
@@ -352,10 +354,10 @@ export default {
       //     if (
       //       !this.available_charts[source] &&
       //       this.dashboard_instances[source] &&
-      //       this.$store.state['dashboard_' + this.host].paths.length > 0 &&
+      //       this.$store.state['dashboard_' + this.log].paths.length > 0 &&
       //       this.__white_black_lists_filter(whitelist, blacklist, source)
       //     ) {
-      //       debug('__init_charts $store.state.tabular_sources creating', source, this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false))
+      //       debug('__init_charts $store.state.tabular_sources creating', source, this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false))
       //
       //       this.$set(this.available_charts, source, Object.merge(
       //         Object.clone({
@@ -372,8 +374,8 @@ export default {
       //             // sources: [{type: 'tabular', path: source}],
       //             data: [this.$options['tabular_sources'][source].data],
       //             events: [{
-      //               host: this.host,
-      //               path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+      //               log: this.log,
+      //               path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
       //               // key: 'cpus',
       //               // length: this.seconds,
       //               tabular: true
@@ -419,8 +421,8 @@ export default {
       //         debug('on tabular_sources', source, this.$options['tabular_sources'][source])
       //         this.$set(this.available_charts[source].stat, 'data', [this.$options['tabular_sources'][source].data])
       //
-      //         debug('host tabular_sources skip', this.$options['tabular_sources'][source].step)
-      //         // console.log('host tabular_sources skip', this.$options['tabular_sources'][source].step)
+      //         debug('log tabular_sources skip', this.$options['tabular_sources'][source].step)
+      //         // console.log('log tabular_sources skip', this.$options['tabular_sources'][source].step)
       //
       //         this.$set(
       //           this.available_charts[source].chart,
@@ -449,12 +451,12 @@ export default {
       //     if (
       //       !this.available_charts[source] &&
       //       // && this.dashboard_instances[source]
-      //       this.$store.state['dashboard_' + this.host].paths.length > 0 &&
+      //       this.$store.state['dashboard_' + this.log].paths.length > 0 &&
       //       this.__white_black_lists_filter(whitelist, blacklist, source)
       //     ) {
-      //       debug('__init_charts $store.state.stat_sources creating', source, this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false))
+      //       debug('__init_charts $store.state.stat_sources creating', source, this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false))
       //
-      //       let chart_payload = this.$options.charts_payloads[source.replace(this.host + '_', '')]
+      //       let chart_payload = this.$options.charts_payloads[source.replace(this.log + '_', '')]
       //
       //       this.$set(this.available_charts, source, Object.merge(
       //         Object.clone({
@@ -472,8 +474,8 @@ export default {
       //             // sources: [{type: 'stat', path: source}],
       //             data: [this.$options['stat_sources'][source].data],
       //             events: [{
-      //               host: this.host,
-      //               path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+      //               log: this.log,
+      //               path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
       //               // key: 'cpus',
       //               // length: this.seconds,
       //               tabular: false
@@ -544,15 +546,15 @@ export default {
           if (re.test(source)) {
             debug('PRE __create_cpus_percentage', source, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
-            let host = source.substring(0, source.indexOf('_'))
+            let log = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
-              (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
-              this.$options['dashboard_' + this.id]['stat_sources'] && this.$options['dashboard_' + this.id]['stat_sources'][host + '_os_cpus']
+              (!this.available_charts[name] || !this.logs_charts[log] || !this.logs_charts[log][name]) &&
+              this.$options['dashboard_' + this.id]['stat_sources'] && this.$options['dashboard_' + this.id]['stat_sources'][log + '_os_cpus']
             ) {
               debug('__create_cpus_percentage', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
-              let cpus = this.$options['dashboard_' + this.id]['stat_sources'][host + '_os_cpus'].data[0].value.length
+              let cpus = this.$options['dashboard_' + this.id]['stat_sources'][log + '_os_cpus'].data[0].value.length
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
@@ -591,8 +593,8 @@ export default {
                     // sources: [{type: 'stat', path: source}],
                     data: [this.$options['dashboard_' + this.id]['tabular_sources'][source].data],
                     // events: [{
-                    //   host: this.host,
-                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   log: this.log,
+                    //   path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
                     //   // key: 'cpus',
                     //   // length: this.seconds,
                     //   tabular: false
@@ -612,16 +614,16 @@ export default {
                 })
                 // chart_payload,
                 // {
-                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
-                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                //   // chart: {totalmem: stat_sources[this.log+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.log+'_os_totalmem'].data[0].value}
                 // }
               ))
 
               this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
 
-              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+              if (!this.logs_charts[log]) { this.$set(this.logs_charts, log, {}) }
 
-              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+              this.$set(this.logs_charts[log], name, this.available_charts[name])
 
               /**
               * set color based on current theme
@@ -636,7 +638,7 @@ export default {
                 let re = /_os_cpus_percentage$/
                 Object.each(this.$options['dashboard_' + this.id]['tabular_sources'], function (data, source) {
                   if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
+                    let log = source.substring(0, source.indexOf('_'))
                     let name = source + '_pie'
                     debug('on tabular_sources', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -660,11 +662,11 @@ export default {
                 // }
               }.bind(this))
             }
-            debug('cpus_percentage pie', this.hosts_charts[host])
+            debug('cpus_percentage pie', this.logs_charts[log])
           }
         }.bind(this))
 
-        // let source = this.host + '_os_freemem'
+        // let source = this.log + '_os_freemem'
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
@@ -675,10 +677,10 @@ export default {
           if (re.test(source)) {
             debug('PRE __create_os_loadavg', source, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
-            let host = source.substring(0, source.indexOf('_'))
+            let log = source.substring(0, source.indexOf('_'))
             let name = source + '_odometer'
             if (
-              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
+              !this.available_charts[name] || !this.logs_charts[log] || !this.logs_charts[log][name]
             ) {
               debug('__create_os_loadavg', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -705,8 +707,8 @@ export default {
                     // sources: [{type: 'stat', path: source}],
                     data: [this.$options['dashboard_' + this.id]['tabular_sources'][source].data],
                     // events: [{
-                    //   host: this.host,
-                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   log: this.log,
+                    //   path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
                     //   // key: 'cpus',
                     //   // length: this.seconds,
                     //   tabular: false
@@ -726,17 +728,17 @@ export default {
                 })
                 // chart_payload,
                 // {
-                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
-                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                //   // chart: {totalmem: stat_sources[this.log+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.log+'_os_totalmem'].data[0].value}
                 // }
               ))
 
               // this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
               this.$set(this.available_charts[name], 'chart', {})
 
-              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+              if (!this.logs_charts[log]) { this.$set(this.logs_charts, log, {}) }
 
-              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+              this.$set(this.logs_charts[log], name, this.available_charts[name])
 
               /**
               * set color based on current theme
@@ -751,7 +753,7 @@ export default {
                 let re = /_os_loadavg$/
                 Object.each(this.$options['dashboard_' + this.id]['tabular_sources'], function (data, source) {
                   if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
+                    let log = source.substring(0, source.indexOf('_'))
                     let name = source + '_odometer'
                     debug('on tabular_sources', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -775,11 +777,11 @@ export default {
                 // }
               }.bind(this))
             }
-            debug('os_loadavg odometer', this.hosts_charts[host])
+            debug('os_loadavg odometer', this.logs_charts[log])
           }
         }.bind(this))
 
-        // let source = this.host + '_os_freemem'
+        // let source = this.log + '_os_freemem'
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
@@ -790,10 +792,10 @@ export default {
           if (re.test(source)) {
             debug('PRE __create_os_uptime', source, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
-            let host = source.substring(0, source.indexOf('_'))
+            let log = source.substring(0, source.indexOf('_'))
             let name = source + '_odometer'
             if (
-              !this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]
+              !this.available_charts[name] || !this.logs_charts[log] || !this.logs_charts[log][name]
             ) {
               debug('__create_os_uptime', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -820,8 +822,8 @@ export default {
                     // sources: [{type: 'stat', path: source}],
                     data: [],
                     // events: [{
-                    //   host: this.host,
-                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   log: this.log,
+                    //   path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
                     //   // key: 'cpus',
                     //   // length: this.seconds,
                     //   tabular: false
@@ -841,17 +843,17 @@ export default {
                 })
                 // chart_payload,
                 // {
-                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
-                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                //   // chart: {totalmem: stat_sources[this.log+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.log+'_os_totalmem'].data[0].value}
                 // }
               ))
 
               // this.$set(this.available_charts[name], 'chart', Object.clone(pie_chart))
               this.$set(this.available_charts[name], 'chart', {})
 
-              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+              if (!this.logs_charts[log]) { this.$set(this.logs_charts, log, {}) }
 
-              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+              this.$set(this.logs_charts[log], name, this.available_charts[name])
 
               /**
               * set color based on current theme
@@ -866,7 +868,7 @@ export default {
                 let re = /_os_uptime$/
                 Object.each(this.$options['dashboard_' + this.id]['tabular_sources'], function (data, source) {
                   if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
+                    let log = source.substring(0, source.indexOf('_'))
                     let name = source + '_odometer'
                     debug('on tabular_sources', name, this.$options['dashboard_' + this.id]['tabular_sources'][source])
 
@@ -899,11 +901,11 @@ export default {
                 // }
               }.bind(this))
             }
-            debug('os_uptime odometer', this.hosts_charts[host])
+            debug('os_uptime odometer', this.logs_charts[log])
           }
         }.bind(this))
 
-        // let source = this.host + '_os_freemem'
+        // let source = this.log + '_os_freemem'
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
@@ -914,15 +916,15 @@ export default {
           if (re.test(source)) {
             debug('PRE __create_freemem', source, this.$options['dashboard_' + this.id]['stat_sources'][source])
 
-            let host = source.substring(0, source.indexOf('_'))
+            let log = source.substring(0, source.indexOf('_'))
             let name = source + '_pie'
             if (
-              (!this.available_charts[name] || !this.hosts_charts[host] || !this.hosts_charts[host][name]) &&
-              stat_sources[host + '_os_totalmem']
+              (!this.available_charts[name] || !this.logs_charts[log] || !this.logs_charts[log][name]) &&
+              stat_sources[log + '_os_totalmem']
             ) {
               debug('__create_freemem', name, this.$options['dashboard_' + this.id]['stat_sources'][source])
 
-              let totalmem = (stat_sources[host + '_os_totalmem'].data[0].value / 1024 / 1024 / 1024).toFixed(0)
+              let totalmem = (stat_sources[log + '_os_totalmem'].data[0].value / 1024 / 1024 / 1024).toFixed(0)
               this.$set(this.available_charts, name, Object.merge(
                 Object.clone({
                   name: name,
@@ -961,8 +963,8 @@ export default {
                     // sources: [{type: 'stat', path: source}],
                     data: [this.$options['dashboard_' + this.id]['stat_sources'][source].data],
                     // events: [{
-                    //   host: this.host,
-                    //   path: this.__match_source_paths(source.replace(this.host + '_', ''), this.$store.state['dashboard_' + this.host].paths, false),
+                    //   log: this.log,
+                    //   path: this.__match_source_paths(source.replace(this.log + '_', ''), this.$store.state['dashboard_' + this.log].paths, false),
                     //   // key: 'cpus',
                     //   // length: this.seconds,
                     //   tabular: false
@@ -982,13 +984,13 @@ export default {
                 })
                 // chart_payload,
                 // {
-                //   // chart: {totalmem: stat_sources[this.host+'_os_totalmem'][0].data}
-                //   chart: {totalmem: this.$options.stat_sources[this.host+'_os_totalmem'].data[0].value}
+                //   // chart: {totalmem: stat_sources[this.log+'_os_totalmem'][0].data}
+                //   chart: {totalmem: this.$options.stat_sources[this.log+'_os_totalmem'].data[0].value}
                 // }
               ))
 
               this.$set(this.available_charts[name], 'chart', Object.merge(Object.clone(pie_chart), {
-                totalmem: stat_sources[host + '_os_totalmem'].data[0].value,
+                totalmem: stat_sources[log + '_os_totalmem'].data[0].value,
                 watch: {
                   /**
                   * @trasnform: diff between each value against its prev one
@@ -1020,9 +1022,9 @@ export default {
                 // }
               }))
 
-              if (!this.hosts_charts[host]) { this.$set(this.hosts_charts, host, {}) }
+              if (!this.logs_charts[log]) { this.$set(this.logs_charts, log, {}) }
 
-              this.$set(this.hosts_charts[host], name, this.available_charts[name])
+              this.$set(this.logs_charts[log], name, this.available_charts[name])
 
               /**
               * set color based on current theme
@@ -1037,7 +1039,7 @@ export default {
                 let re = /_os_freemem$/
                 Object.each(this.$options['dashboard_' + this.id]['stat_sources'], function (data, source) {
                   if (re.test(source)) {
-                    let host = source.substring(0, source.indexOf('_'))
+                    let log = source.substring(0, source.indexOf('_'))
                     let name = source + '_pie'
                     debug('on stat_sources', name, this.$options['dashboard_' + this.id]['stat_sources'][source])
 
@@ -1061,11 +1063,11 @@ export default {
                 // }
               }.bind(this))
             }
-            debug('freemem pie', this.hosts_charts[host])
+            debug('freemem pie', this.logs_charts[log])
           }
         }.bind(this))
 
-        // let source = this.host + '_os_freemem'
+        // let source = this.log + '_os_freemem'
         // let chart_payload = this.$options.charts_payloads['os_freemem']
       }.bind(this)
 
@@ -1103,7 +1105,7 @@ export default {
           this.$options['dashboard_' + this.id] &&
           this.$options['dashboard_' + this.id].stat_sources
           // this.dashboard_instances &&
-          // this.$store.state['dashboard_' + this.host].paths.length > 0
+          // this.$store.state['dashboard_' + this.log].paths.length > 0
         ) {
           debug('$options.stat_sources TRUE', this.$options['dashboard_' + this.id].stat_sources, this.id)
           // __create_from_stat_sources(this.$options.stat_sources)
@@ -1118,8 +1120,8 @@ export default {
 
       this.$on('stat_sources', __stat_sources_event)
     },
-    __process_dashboard_host: function (payloads) {
-      debug('__process_dashboard_host', payloads)
+    __process_dashboard_log: function (payloads) {
+      debug('__process_dashboard_log', payloads)
 
       if (payloads && Array.isArray(payloads) && payloads.length > 0) {
         Array.each(payloads, function (payload) {
@@ -1134,8 +1136,8 @@ export default {
     __process_dashboard_data: function (payload) {
       debug('__process_dashboard_data', payload)
 
-      // if (payload && payload.host === this.host) {
-      if (payload && payload.host) { // WATCH OUT - modified
+      // if (payload && payload.log === this.log) {
+      if (payload && payload.log) { // WATCH OUT - modified
         // let type = (payload.tabular == true) ? 'tabular' : 'stat'
         let { type } = payload
 
@@ -1210,27 +1212,27 @@ export default {
       debug('__set_source', type, this.$options['dashboard_' + this.id][type + '_sources'])
     },
     /**
-    * @end single host
+    * @end single log
     **/
     /**
-    * all hosts
+    * all logs
     **/
-    __process_dashboard_hosts: function (payload) {
-      debug('__process_dashboard_hosts', payload)
+    __process_dashboard_logs: function (payload) {
+      debug('__process_dashboard_logs', payload)
 
-      if (Array.isArray(payload.hosts) && payload.hosts.length > 0) {
+      if (Array.isArray(payload.logs) && payload.logs.length > 0) {
         let _menu = {}
-        Array.each(payload.hosts, function (host) {
-          _menu[host] = {
-            label: host, icon: 'desktop_windows', route: { name: 'host', params: { host: host } }
+        Array.each(payload.logs, function (log) {
+          _menu[log] = {
+            label: log, icon: 'desktop_windows', route: { name: 'log', params: { log: log } }
           }
         })
 
-        this.$set(this.panels.charts.menu.hosts, 'menu', _menu)
+        this.$set(this.panels.charts.menu.logs, 'menu', _menu)
 
-        this.$store.commit('hosts/clear')
-        this.$store.commit('hosts/set', payload.hosts)
-        this.create_pipelines(payload.hosts)
+        this.$store.commit('logs/clear')
+        this.$store.commit('logs/set', payload.logs)
+        this.create_pipelines(payload.logs)
       }
     }
   }
