@@ -129,11 +129,11 @@ export default new Class({
     this.addEvent('onConnect', function(){
       debug('initialize socket.onConnect', this.io.id)
       // this.io.emit('on', 'logs')
-      this.io.emit('/', {
+      this.io.emit('on', 'changes', {
         params: { prop: undefined },
-        query: {
-          "register": "changes",
-        },
+        // query: {
+        //   "register": "changes",
+        // },
         body: {
         	"q": [
         		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
