@@ -129,20 +129,45 @@ export default new Class({
     this.addEvent('onConnect', function(){
       debug('initialize socket.onConnect', this.io.id)
       // this.io.emit('on', 'logs')
-      this.io.emit('on', 'changes', {
+      // this.io.emit('on', 'changes', {
+      //   params: { prop: undefined },
+      //   // query: {
+      //   //   "register": "changes",
+      //   // },
+      //   // body: {
+      //   // 	"q": [
+      //   // 		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
+      //   // 		{"metadata": ["host"]}
+      //   // 	]
+      //   //
+      //   // }
+      //   // body: {
+      //   // 	"aggregation": "count"
+      //   // }
+      // })
+      this.io.emit('on', 'periodical', {
         params: { prop: undefined },
         // query: {
-        //   "register": "changes",
+        //   // "register": "changes",
+        //   "interval": 10000,
         // },
+        // body: {
+        // 	"q": [
+        // 		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
+        // 		{"metadata": ["host"]}
+        // 	]
+        //
+        // }
+
         body: {
-        	"q": [
-        		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
-        		{"metadata": ["host"]}
-        	]
-
+          "interval": 10000,
+          // "q": [
+        	// 	{"metadata": ["path"]}
+        	// ],
+        	"aggregation": "count"
         }
-
       })
+
       // this.io.emit('/')
 
     })
