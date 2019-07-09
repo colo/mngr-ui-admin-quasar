@@ -169,34 +169,34 @@ export default new Class({
       //   }
       // })
 
+      this.io.emit('on', 'periodical', {
+        params: { prop: undefined },
+
+        body: {
+          // "interval": 5000,
+        	"aggregation": "count"
+        }
+      })
+
+      this.io.emit('on', 'periodical', {
+        params: { prop: undefined },
+
+        body: {
+          // "interval": 5000,
+        	"q": [
+        		{"data": ["status"]},
+        	],
+        	"filter": "('data')('status').eq(200)",
+          "aggregation": "count"
+        }
+      })
+
       // this.io.emit('on', 'periodical', {
-      //   params: { prop: undefined },
-      //
       //   body: {
       //     "interval": 5000,
-      //   	"aggregation": "count"
-      //   }
-      // })
-      //
-      // this.io.emit('on', 'periodical', {
-      //   params: { prop: undefined },
-      //
-      //   body: {
-      //     "interval": 5000,
-      //   	"q": [
-      //   		{"data": ["status"]},
-      //   	],
-      //   	"filter": "('data')('status').eq(200)",
-      //     "aggregation": "count"
       //   }
       // })
 
-      this.io.emit('on', 'periodical', {
-        body: {
-          "interval": 5000,
-        }
-      })
-      
       this.io.emit('/')
 
     })
