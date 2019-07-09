@@ -145,30 +145,59 @@ export default new Class({
       //   // 	"aggregation": "count"
       //   // }
       // })
-      this.io.emit('on', 'periodical', {
-        params: { prop: undefined },
-        // query: {
-        //   // "register": "changes",
-        //   "interval": 10000,
-        // },
-        // body: {
-        // 	"q": [
-        // 		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
-        // 		{"metadata": ["host"]}
-        // 	]
-        //
-        // }
 
+      // this.io.emit('on', 'periodical', {
+      //   params: { prop: undefined },
+      //   // query: {
+      //   //   // "register": "changes",
+      //   //   "interval": 10000,
+      //   // },
+      //   // body: {
+      //   // 	"q": [
+      //   // 		{"data": ["body_bytes_sent", "remote_addr", {"user_agent": {"os": ["family"]}}]},
+      //   // 		{"metadata": ["host"]}
+      //   // 	]
+      //   //
+      //   // }
+      //
+      //   body: {
+      //     "interval": 10000,
+      //     // "q": [
+      //   	// 	{"metadata": ["path"]}
+      //   	// ],
+      //   	"aggregation": "count"
+      //   }
+      // })
+
+      // this.io.emit('on', 'periodical', {
+      //   params: { prop: undefined },
+      //
+      //   body: {
+      //     "interval": 5000,
+      //   	"aggregation": "count"
+      //   }
+      // })
+      //
+      // this.io.emit('on', 'periodical', {
+      //   params: { prop: undefined },
+      //
+      //   body: {
+      //     "interval": 5000,
+      //   	"q": [
+      //   		{"data": ["status"]},
+      //   	],
+      //   	"filter": "('data')('status').eq(200)",
+      //     "aggregation": "count"
+      //   }
+      // })
+
+      this.io.emit('on', 'periodical', {
         body: {
-          "interval": 10000,
-          // "q": [
-        	// 	{"metadata": ["path"]}
-        	// ],
-        	"aggregation": "count"
+          "interval": 5000,
         }
       })
-
-      // this.io.emit('/')
+      
+      this.io.emit('/')
 
     })
 
