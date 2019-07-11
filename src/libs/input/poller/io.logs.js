@@ -79,10 +79,49 @@ export default new Class({
 
   },
   logs: function(socket, next, doc){
-    debug('logs %o', doc)
-    let {type} = doc
+    // let {type} = doc
 
-    this.fireEvent('onDoc', [doc, { type: type, input_type: this, app: null }])
+    if(doc.status){
+      debug('ERROR logs %o', doc)
+    }
+    else if(doc.logs && (!doc.opts || !doc.opts.params || Object.getLength(doc.opts.params) === 0)){
+      debug('logs %o', doc)
+      Array.each(doc.logs.tags, function(tag){
+        debug('TAG %s', tag)
+        // this.io.emit('/tags/'+tag)
+        this.io.emit('/', {
+          params: { prop: 'tags' },
+          range: "posix 1557135759000-1557136059000/*",
+          body: {
+            // "transformation" : "limit:30000",
+            "params":{
+          		"value": tag
+          	}
+          }
+        })
+
+      }.bind(this))
+
+      Array.each(doc.logs.hosts, function(host){
+        debug('HOST %s', host)
+        // this.io.emit('/tags/'+tag)
+        this.io.emit('/', {
+          params: { prop: 'hosts' },
+          range: "posix 1557135759000-1557136059000/*",
+          body: {
+            // "transformation" : "limit:30000",
+          	"params":{
+          		"value": host
+          	}
+          }
+        })
+
+      }.bind(this))
+    }
+    else{
+      debug('OTHERS logs %o', doc)
+    }
+    // this.fireEvent('onDoc', [doc, { type: type, input_type: this, app: null }])
 
     // store.commit('logs/clear')
     // store.commit('logs/set', doc[type])
@@ -169,35 +208,37 @@ export default new Class({
       //   }
       // })
 
-      this.io.emit('on', 'periodical', {
-        params: { prop: undefined },
-
-        body: {
-          // "interval": 5000,
-        	"aggregation": "count"
-        }
-      })
-
-      this.io.emit('on', 'periodical', {
-        params: { prop: undefined },
-
-        body: {
-          // "interval": 5000,
-        	"q": [
-        		{"data": ["status"]},
-        	],
-        	"filter": "('data')('status').eq(200)",
-          "aggregation": "count"
-        }
-      })
-
       // this.io.emit('on', 'periodical', {
+      //   params: { prop: undefined },
+      //
       //   body: {
-      //     "interval": 5000,
+      //     // "interval": 5000,
+      //   	"aggregation": "count"
+      //   }
+      // })
+      //
+      // this.io.emit('on', 'periodical', {
+      //   params: { prop: undefined },
+      //
+      //   body: {
+      //     // "interval": 5000,
+      //   	"q": [
+      //   		{"data": ["status"]},
+      //   	],
+      //   	"filter": "('data')('status').eq(200)",
+      //     "aggregation": "count"
       //   }
       // })
 
-      this.io.emit('/')
+      this.io.emit('on', 'periodical', {
+        range: "posix 1557135759000-1557136059000/*",
+        body: {
+          // "transformation" : "limit:30000"
+        //   "interval": 5000,
+        }
+      })
+
+      // this.io.emit('/')
 
     })
 
