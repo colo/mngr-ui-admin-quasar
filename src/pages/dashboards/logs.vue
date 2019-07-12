@@ -313,7 +313,7 @@ export default {
     **/
     __create: function (id, next) { // process one event only ('log')
       this.$eventbus.$on('logs', this.__process_dashboard_logs.bind(this))
-      this.$eventbus.$on('logs.log', this.__process_dashboard_log.bind(this))
+      // this.$eventbus.$on('logs.log', this.__process_dashboard_log.bind(this))
 
       this.__logs_module()// why __hosts_module isn't here on hosts.vue??
 

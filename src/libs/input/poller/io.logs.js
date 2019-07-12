@@ -121,7 +121,8 @@ export default new Class({
     else{
       debug('OTHERS logs %o', doc)
     }
-    // this.fireEvent('onDoc', [doc, { type: type, input_type: this, app: null }])
+
+    this.fireEvent('onDoc', [doc, { input_type: this, app: null }])
 
     // store.commit('logs/clear')
     // store.commit('logs/set', doc[type])
@@ -238,6 +239,12 @@ export default new Class({
         }
       })
 
+      this.io.emit('on', 'periodical', {
+        // range: "posix 1557135759000-1557136059000/*",
+        body: {
+           "aggregation": "count"
+        }
+      })
       // this.io.emit('/')
 
     })

@@ -46,7 +46,7 @@ export default {
     function (payload) {
       debug('OUTPUT', payload)
 
-      if (!payload.err) { EventBus.$emit(payload.type, payload) }
+      if (!payload.err) { EventBus.$emit(payload.input, payload) }
 
       // if (!payload.err) { EventBus.$emit('log', payload) }
     }
