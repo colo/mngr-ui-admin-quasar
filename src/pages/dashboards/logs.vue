@@ -27,6 +27,14 @@
       </dashboard-menu-tabs>
     </dashboard-menu>
 
+    <q-card class="bg-secondary" :dark="$store.state.app.theme.current === 'slate'" :class="($store.state.app.theme.current === 'slate') ? 'text-white' : 'text-black'">
+
+      <q-card-section>
+        <div class="text-h6">Logs</div>
+        <div class="text-subtitle2">Count: 8k</div>
+        <!-- <q-rating size="24px" v-model="stars" :max="5" /> -->
+      </q-card-section>
+    </q-card>
     <!-- <div class="row items-center justify-center" :dark="$store.state.app.theme.current === 'slate'">
       <template v-for="log in $store.state['logs'].all">
       <div
