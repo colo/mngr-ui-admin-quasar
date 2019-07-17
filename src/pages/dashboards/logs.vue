@@ -27,7 +27,7 @@
       </dashboard-menu-tabs>
     </dashboard-menu>
 
-    <div class="row items-center justify-center" :dark="$store.state.app.theme.current === 'slate'">
+    <!-- <div class="row items-center justify-center" :dark="$store.state.app.theme.current === 'slate'">
       <template v-for="log in $store.state['logs'].all">
       <div
       :key="log"
@@ -51,7 +51,7 @@
           :header-class="($store.state.app.theme.current === 'slate') ? 'text-white' : 'text-black'"
         >
         <div class="row justify-center">
-          <!-- items-center  -->
+
           <template v-for="(chart, name) in logs_charts[log]">
             <div :key="log+'-'+name" class="column">
             <div class="col text-grey q-pa-md text-center">
@@ -72,24 +72,18 @@
                   data: chart.stat.data
                 }"
               >
-              <!-- :stat="{
-                range: range,
-                length: chart.stat.length,
-                merged: chart.stat.merged,
-                data: chart.stat.sources ? chart.stat.sources.map(function(source){ return $store.state[source.type+'_sources'][source.path]}) : chart.stat.data
-              }" -->
-              <!-- :always_update="graph_always_update" -->
+
               </component>
 
             </div>
-            </div> <!-- column -->
+            </div>
         </template>
         </div>
         </q-expansion-item>
 
       </div>
       </template>
-    </div>
+    </div> -->
 
     <!-- https://stackoverflow.com/questions/40404787/best-practice-for-reacting-to-params-changes-with-vue-router -->
     <transition name="view" mode="out-in" appear>
