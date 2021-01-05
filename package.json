@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.1.1",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "dygraphs": "^2.1.0",
     "js-pipeline": "git+https://github.com/colo/js-pipeline.git",
     "mngr-ui-admin-charts": "git+https://github.com/colo/mngr-ui-admin-charts.git",
